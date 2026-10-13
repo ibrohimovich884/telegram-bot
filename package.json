@@ -1,0 +1,17 @@
+{
+  "name": "telegram-business-bot",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@google/genai": "^1.0.0",
+    "dotenv": "^16.4.5",
+    "grammy": "^1.30.0"
+  }
+}
