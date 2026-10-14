@@ -6,6 +6,8 @@ import { GoogleGenAI } from "@google/genai";
 const bot = new Bot(process.env.BOT_TOKEN);
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
+const GEMINI_MODEL = "gemini-3.8-flash";
+
 const SYSTEM_PROMPT =
   "Sen Oybekning nomidan javob beryapsan. Qisqa, samimiy va o'zbek tilida yoz. " +
     "Agar bilmasang, Oybek keyinroq javob beradi, deb ayt.";
@@ -38,84 +40,132 @@ const SYSTEM_PROMPT =
                                           process.on("uncaughtException", (err) => logError("uncaughtException", err));
                                           process.on("unhandledRejection", (err) => logError("unhandledRejection", err));
 
-                                          // ---------- Bot ----------
-                                          // business_connection_id -> akkaunt egasining ID si
-                                          const ownerCache = new Map();
+                                          // ---------- Gemini (503/429 bo'lsa qayta urinadi) ----------
+                                          const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-                                          async function getOwnerId(connectionId) {
-                                            if (ownerCache.has(connectionId)) return ownerCache.get(connectionId);
-                                              const conn = await bot.api.getBusinessConnection(connectionId);
-                                                ownerCache.set(connectionId, conn.user.id);
-                                                  return conn.user.id;
-                                                  }
+                                          async function askGemini(text) {
+                                            const MAX_ATTEMPTS = 3;
+                                              for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+                                                  try {
+                                                        const result = await ai.models.generateContent({
+                                                                model: GEMINI_MODEL,
+                                                                        contents: text,
+                                                                                config: { systemInstruction: SYSTEM_PROMPT },
+                                                                                      });
+                                                                                            return result.text;
+                                                                                                } catch (err) {
+                                                                                                      const msg = String(err?.message ?? err);
+                                                                                                            const retryable =
+                                                                                                                    [429, 500, 503].includes(err?.status) ||
+                                                                                                                            msg.includes("UNAVAILABLE") ||
+                                                                                                                                    msg.includes("RESOURCE_EXHAUSTED");
+                                                                                                                                          if (!retryable || attempt === MAX_ATTEMPTS) throw err;
+                                                                                                                                                console.log(`[GEMINI] ${attempt}-urinish bo'lmadi, ${attempt * 3}s dan keyin qayta uriniladi`);
+                                                                                                                                                      await sleep(attempt * 3000);
+                                                                                                                                                          }
+                                                                                                                                                            }
+                                                                                                                                                            }
 
-                                                  // Kelgan har bir update turini logga yozamiz
-                                                  bot.use(async (ctx, next) => {
-                                                    const types = Object.keys(ctx.update).filter((k) => k !== "update_id");
-                                                      console.log(`[UPDATE] ${new Date().toISOString()} | ${types.join(", ")}`);
-                                                        await next();
-                                                        });
+                                                                                                                                                            // ---------- Bot ----------
+                                                                                                                                                            // business_connection_id -> akkaunt egasining ID si
+                                                                                                                                                            const ownerCache = new Map();
 
-                                                        bot.on("business_connection", (ctx) => {
-                                                          const c = ctx.businessConnection;
-                                                            console.log(
-                                                                `[ULANISH] user=${c.user.id} faol=${c.is_enabled} javob_berish=${c.can_reply}`
-                                                                  );
-                                                                  });
+                                                                                                                                                            async function getOwnerId(connectionId) {
+                                                                                                                                                              if (ownerCache.has(connectionId)) return ownerCache.get(connectionId);
+                                                                                                                                                                const conn = await bot.api.getBusinessConnection(connectionId);
+                                                                                                                                                                  ownerCache.set(connectionId, conn.user.id);
+                                                                                                                                                                    return conn.user.id;
+                                                                                                                                                                    }
 
-                                                                  bot.on("business_message:text", async (ctx) => {
-                                                                    const connectionId = ctx.msg.business_connection_id;
+                                                                                                                                                                    // Kelgan har bir update turini logga yozamiz
+                                                                                                                                                                    bot.use(async (ctx, next) => {
+                                                                                                                                                                      const types = Object.keys(ctx.update).filter((k) => k !== "update_id");
+                                                                                                                                                                        console.log(`[UPDATE] ${new Date().toISOString()} | ${types.join(", ")}`);
+                                                                                                                                                                          await next();
+                                                                                                                                                                          });
 
-                                                                      try {
-                                                                          // Egasining o'z xabariga javob bermaymiz
-                                                                              const ownerId = await getOwnerId(connectionId);
-                                                                                  if (ctx.from.id === ownerId) {
-                                                                                        console.log("[SKIP] egasining o'z xabari");
-                                                                                              return;
-                                                                                                  }
+                                                                                                                                                                          bot.on("business_connection", (ctx) => {
+                                                                                                                                                                            const c = ctx.businessConnection;
+                                                                                                                                                                              console.log(
+                                                                                                                                                                                  `[ULANISH] user=${c.user.id} faol=${c.is_enabled} javob_berish=${c.can_reply}`
+                                                                                                                                                                                    );
+                                                                                                                                                                                    });
 
-                                                                                                      const result = await ai.models.generateContent({
-                                                                                                            model: "gemini-3.8-flash",
-                                                                                                                  contents: ctx.msg.text,
-                                                                                                                        config: { systemInstruction: SYSTEM_PROMPT },
-                                                                                                                            });
+                                                                                                                                                                                    bot.on("business_message:text", async (ctx) => {
+                                                                                                                                                                                      const connectionId = ctx.msg.business_connection_id;
 
-                                                                                                                                const reply = result.text;
-                                                                                                                                    if (!reply) throw new Error("Gemini bo'sh javob qaytardi");
+                                                                                                                                                                                        try {
+                                                                                                                                                                                            // Egasining o'z xabariga javob bermaymiz
+                                                                                                                                                                                                const ownerId = await getOwnerId(connectionId);
+                                                                                                                                                                                                    if (ctx.from.id === ownerId) {
+                                                                                                                                                                                                          console.log("[SKIP] egasining o'z xabari");
+                                                                                                                                                                                                                return;
+                                                                                                                                                                                                                    }
 
-                                                                                                                                        await ctx.api.sendMessage(ctx.chat.id, reply, {
-                                                                                                                                              business_connection_id: connectionId,
-                                                                                                                                                  });
-                                                                                                                                                      console.log(`[JAVOB] chat=${ctx.chat.id} yuborildi`);
-                                                                                                                                                        } catch (err) {
-                                                                                                                                                            logError("business_message", err);
-                                                                                                                                                              }
-                                                                                                                                                              });
+                                                                                                                                                                                                                        const reply = await askGemini(ctx.msg.text);
+                                                                                                                                                                                                                            if (!reply) throw new Error("Gemini bo'sh javob qaytardi");
 
-                                                                                                                                                              bot.catch((err) => logError("bot.catch", err.error ?? err));
+                                                                                                                                                                                                                                await ctx.api.sendMessage(ctx.chat.id, reply, {
+                                                                                                                                                                                                                                      business_connection_id: connectionId,
+                                                                                                                                                                                                                                          });
+                                                                                                                                                                                                                                              console.log(`[JAVOB] chat=${ctx.chat.id} yuborildi`);
+                                                                                                                                                                                                                                                } catch (err) {
+                                                                                                                                                                                                                                                    logError("business_message", err);
+                                                                                                                                                                                                                                                      }
+                                                                                                                                                                                                                                                      });
 
-                                                                                                                                                              // ---------- HTTP server (Render uchun) ----------
-                                                                                                                                                              const PORT = process.env.PORT || 3000;
+                                                                                                                                                                                                                                                      bot.catch((err) => logError("bot.catch", err.error ?? err));
 
-                                                                                                                                                              http
-                                                                                                                                                                .createServer((req, res) => {
-                                                                                                                                                                    const path = (req.url || "/").split("?")[0];
+                                                                                                                                                                                                                                                      // ---------- HTTP server (Render uchun) ----------
+                                                                                                                                                                                                                                                      const PORT = process.env.PORT || 3000;
 
-                                                                                                                                                                        if (path === "/errors") {
-                                                                                                                                                                              res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
-                                                                                                                                                                                    res.end(JSON.stringify({ count: errors.length, errors }, null, 2));
-                                                                                                                                                                                          return;
-                                                                                                                                                                                              }
+                                                                                                                                                                                                                                                      http
+                                                                                                                                                                                                                                                        .createServer((req, res) => {
+                                                                                                                                                                                                                                                            const path = (req.url || "/").split("?")[0];
 
-                                                                                                                                                                                                  res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
-                                                                                                                                                                                                      res.end("Bot ishlayapti");
-                                                                                                                                                                                                        })
-                                                                                                                                                                                                          .listen(PORT, () => console.log(`HTTP server port: ${PORT}`));
+                                                                                                                                                                                                                                                                if (path === "/errors") {
+                                                                                                                                                                                                                                                                      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+                                                                                                                                                                                                                                                                            res.end(JSON.stringify({ count: errors.length, errors }, null, 2));
+                                                                                                                                                                                                                                                                                  return;
+                                                                                                                                                                                                                                                                                      }
 
-                                                                                                                                                                                                          // ---------- Ishga tushirish ----------
-                                                                                                                                                                                                          bot
-                                                                                                                                                                                                            .start({
-                                                                                                                                                                                                                allowed_updates: ["message", "business_connection", "business_message"],
-                                                                                                                                                                                                                    onStart: (info) => console.log(`Bot ishga tushdi: @${info.username}`),
-                                                                                                                                                                                                                      })
-                                                                                                                                                                                                                        .catch((err) => logError("bot.start", err));
+                                                                                                                                                                                                                                                                                          res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
+                                                                                                                                                                                                                                                                                              res.end("Bot ishlayapti");
+                                                                                                                                                                                                                                                                                                })
+                                                                                                                                                                                                                                                                                                  .listen(PORT, () => console.log(`HTTP server port: ${PORT}`));
+
+                                                                                                                                                                                                                                                                                                  // ---------- Ishga tushirish ----------
+                                                                                                                                                                                                                                                                                                  // 409 Conflict (deploy paytida eski nusxa hali o'chmagan bo'lsa) chiqsa,
+                                                                                                                                                                                                                                                                                                  // bot to'xtab qolmasligi uchun 10 soniyadan keyin qayta ishga tushiriladi
+                                                                                                                                                                                                                                                                                                  let shuttingDown = false;
+
+                                                                                                                                                                                                                                                                                                  async function startBot() {
+                                                                                                                                                                                                                                                                                                    while (!shuttingDown) {
+                                                                                                                                                                                                                                                                                                        try {
+                                                                                                                                                                                                                                                                                                              await bot.start({
+                                                                                                                                                                                                                                                                                                                      allowed_updates: ["message", "business_connection", "business_message"],
+                                                                                                                                                                                                                                                                                                                              onStart: (info) => console.log(`Bot ishga tushdi: @${info.username}`),
+                                                                                                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                                                                                                          return; // bot.stop() chaqirilganda shu yerga keladi
+                                                                                                                                                                                                                                                                                                                                              } catch (err) {
+                                                                                                                                                                                                                                                                                                                                                    logError("bot.start", err);
+                                                                                                                                                                                                                                                                                                                                                          console.log("[QAYTA] 10 soniyadan keyin qayta ishga tushiriladi");
+                                                                                                                                                                                                                                                                                                                                                                await sleep(10000);
+                                                                                                                                                                                                                                                                                                                                                                    }
+                                                                                                                                                                                                                                                                                                                                                                      }
+                                                                                                                                                                                                                                                                                                                                                                      }
+
+                                                                                                                                                                                                                                                                                                                                                                      // Render deploy paytida eski nusxa polling'ni tezroq bo'shatishi uchun
+                                                                                                                                                                                                                                                                                                                                                                      process.on("SIGTERM", async () => {
+                                                                                                                                                                                                                                                                                                                                                                        shuttingDown = true;
+                                                                                                                                                                                                                                                                                                                                                                          console.log("SIGTERM: bot to'xtatilmoqda");
+                                                                                                                                                                                                                                                                                                                                                                            try {
+                                                                                                                                                                                                                                                                                                                                                                                await bot.stop();
+                                                                                                                                                                                                                                                                                                                                                                                  } catch (err) {
+                                                                                                                                                                                                                                                                                                                                                                                      logError("SIGTERM", err);
+                                                                                                                                                                                                                                                                                                                                                                                        }
+                                                                                                                                                                                                                                                                                                                                                                                          process.exit(0);
+                                                                                                                                                                                                                                                                                                                                                                                          });
+
+                                                                                                                                                                                                                                                                                                                                                                                          startBot();
+                                                                                                                                                                                                                                                                                                                                                                                          
