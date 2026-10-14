@@ -24,7 +24,7 @@ export const ENABLE_POLLING = process.env.ENABLE_POLLING !== undefined
   ? process.env.ENABLE_POLLING === "true"
   : !isAiStudio;
 
-export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.8-flash";
 
 import { SYSTEM_PROMPT as DEFAULT_PROMPT } from "./prompt.js";
 

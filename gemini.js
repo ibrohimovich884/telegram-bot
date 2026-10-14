@@ -8,27 +8,27 @@ function getAiClient() {
   return new GoogleGenAI(key ? { apiKey: key } : {});
 }
 
-// 404, 503 yoki 429 bo'lsa zaxira model va qayta urinish bilan ishlaydi
+// 503 (high demand), 429 (rate limit) yoki 404 (not found) bo'lsa
+// avtomatik ravishda boshqa zaxira modellarga zudlik bilan o'tadi
 export async function askGemini(text) {
   const modelsToTry = [
-    GEMINI_MODEL,
-    "gemini-2.5-flash",
-    "gemini-2.5-flash-lite",
+    "gemini-3.8-flash",
+    "gemini-3.5-flash-lite",
     "gemini-3.1-flash-lite",
-    "gemini-flash-latest"
+    "gemini-flash-latest",
+    "gemini-3.5-flash",
   ];
-  // Takrorlanmas modellar ro'yxati
+  if (GEMINI_MODEL && !modelsToTry.includes(GEMINI_MODEL)) {
+    modelsToTry.unshift(GEMINI_MODEL);
+  }
+  // Takrorlanmas modellar ro'yxati (birinchi bo'lib gemini-3.8-flash)
   const uniqueModels = [...new Set(modelsToTry.filter(Boolean))];
 
   const ai = getAiClient();
   let lastError = null;
 
-  for (const model of uniqueModels) {
-    let modelUnavailable = false;
-
-    for (let attempt = 1; attempt <= 2; attempt++) {
-      if (modelUnavailable) break;
-
+  for (let round = 1; round <= 2; round++) {
+    for (const model of uniqueModels) {
       try {
         const result = await ai.models.generateContent({
           model,
@@ -43,39 +43,36 @@ export async function askGemini(text) {
         const msg = String(err?.message ?? err).toLowerCase();
         const status = err?.status;
 
-        // Model topilmagan bo'lsa (404 NOT_FOUND, model o'chirilgan yoki mavjud emas):
-        // Shu modelni qayta urinmasdan DARHOL keyingi zaxira modelga o'tadi
         const isNotFound =
           status === 404 ||
           msg.includes("404") ||
           msg.includes("not found") ||
           msg.includes("not_found") ||
           msg.includes("is not found for api version") ||
-          msg.includes("unsupported model");
+          msg.includes("no longer available");
 
-        if (isNotFound) {
-          console.warn(`[GEMINI] Model ${model} topilmadi (404 Not Found). Keyingi zaxira modelga o'tilmoqda...`);
-          modelUnavailable = true;
-          break;
-        }
-
-        const retryable =
-          [429, 500, 503].includes(status) ||
+        const isBusy =
+          status === 503 ||
+          status === 429 ||
+          msg.includes("503") ||
           msg.includes("unavailable") ||
           msg.includes("resource_exhausted") ||
           msg.includes("high demand") ||
           msg.includes("quota") ||
           msg.includes("overloaded");
 
-        if (!retryable) {
-          console.warn(`[GEMINI] ${model} xatolik berdi (${err?.message || err}). Keyingi model tekshiriladi...`);
-          modelUnavailable = true;
-          break;
+        if (isNotFound) {
+          console.warn(`[GEMINI] Model topilmadi (${model}: 404 Not Found). Keyingi zaxira modelga o'tilmoqda...`);
+        } else if (isBusy) {
+          console.warn(`[GEMINI] ${model} vaqtincha band (503/429 High Demand). Zaxira modelga o'tilmoqda...`);
+        } else {
+          console.warn(`[GEMINI] ${model} xatolik berdi (${err?.message || err}). Zaxira model tekshiriladi...`);
         }
-
-        console.log(`[GEMINI] ${model} (${attempt}-urinish) vaqtincha band: ${status || '503'}, qayta urinilmoqda...`);
-        await sleep(attempt * 1000);
       }
+    }
+
+    if (round === 1) {
+      await sleep(800);
     }
   }
 

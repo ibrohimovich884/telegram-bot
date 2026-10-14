@@ -97,9 +97,9 @@ async function pingRender() {
 function checkAuth(req) {
   const adminPassword = (process.env.ADMIN_PASSWORD || ADMIN_PASSWORD || "").trim();
 
-  // 1. Agar ADMIN_PASSWORD belgilanmagan bo'lsa: 503 bilan himoyalangan
+  // 1. Agar ADMIN_PASSWORD belgilanmagan bo'lsa
   if (!adminPassword) {
-    return { ok: false, status: 503, reason: "ADMIN_PASSWORD_NOT_CONFIGURED" };
+    return { ok: false, status: 401, reason: "ADMIN_PASSWORD_NOT_CONFIGURED" };
   }
 
   const authHeader = req.headers["authorization"] || "";
@@ -140,61 +140,6 @@ function checkAuth(req) {
   return { ok: false, status: 401, reason: "UNAUTHORIZED" };
 }
 
-// ADMIN_PASSWORD belgilanmaganda ko'rsatiladigan 503 HTML sahifasi
-function render503Page() {
-  return `<!DOCTYPE html>
-<html lang="uz" class="dark">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>503 - Dashboard Himoyalangan</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="min-h-screen bg-[#090d16] text-slate-200 flex items-center justify-center p-4 font-sans">
-  <div class="max-w-md w-full p-8 rounded-2xl bg-[#111726] border border-amber-500/30 shadow-2xl space-y-4 text-center">
-    <div class="w-12 h-12 mx-auto rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center font-bold text-xl">
-      &#128274;
-    </div>
-    <h1 class="text-xl font-bold text-white tracking-tight">Dashboard Himoyalangan (503)</h1>
-    <p class="text-xs text-slate-400 leading-relaxed">
-      Xavfsizlik maqsadida boshqaruv paneli va API'lar yopiq. Serveringiz (<strong class="text-slate-300">Render Environment</strong>) sozlamalariga <code class="px-1.5 py-0.5 rounded bg-surface-canvas text-amber-400 font-mono">ADMIN_PASSWORD</code> o'zgaruvchisini qo'shing.
-    </p>
-    <div class="p-3 rounded-lg bg-[#090d16] border border-slate-800 text-left text-xs space-y-1">
-      <div class="text-slate-400">&#10003; Telegram Bot faoliyat yuritmoqda</div>
-      <div class="text-slate-400">&#10003; <a href="/health" class="text-sky-400 underline">/health</a> UptimeRobot uchun ochiq</div>
-    </div>
-  </div>
-</body>
-</html>`;
-}
-
-// 401 Unauthorized HTML sahifasi (foydalanuvchi Basic Auth oynasini bekor qilganda)
-function render401Page() {
-  return `<!DOCTYPE html>
-<html lang="uz" class="dark">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>401 - Ruxsat Berilmadi</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="min-h-screen bg-[#090d16] text-slate-200 flex items-center justify-center p-4 font-sans">
-  <div class="max-w-md w-full p-8 rounded-2xl bg-[#111726] border border-rose-500/30 shadow-2xl space-y-4 text-center">
-    <div class="w-12 h-12 mx-auto rounded-full bg-rose-500/10 text-rose-400 flex items-center justify-center font-bold text-xl">
-      &#128683;
-    </div>
-    <h1 class="text-xl font-bold text-white tracking-tight">401 - Ruxsat Berilmadi</h1>
-    <p class="text-xs text-slate-400 leading-relaxed">
-      Dashboard va API'dan foydalanish uchun administrator paroli kiritilishi shart. Sahifani yangilab (F5), parolni qaytadan kiriting.
-    </p>
-    <button onclick="window.location.reload()" class="px-4 py-2 text-xs font-semibold text-white bg-sky-600 rounded-lg hover:bg-sky-500 transition-colors">
-      Qayta urinish
-    </button>
-  </div>
-</body>
-</html>`;
-}
-
 export function startServer() {
   const server = http.createServer(async (req, res) => {
     const parsedUrl = new URL(req.url || "/", `http://${req.headers.host || "localhost"}`);
@@ -211,6 +156,7 @@ export function startServer() {
     if (req.method === "GET" && pathname === "/health") {
       sendJson(res, 200, {
         status: "ok",
+        service: "telegram-business-bot",
         uptime: Math.round(process.uptime()),
         timestamp: new Date().toISOString(),
         polling: botState.pollingStatus,
@@ -219,54 +165,58 @@ export function startServer() {
       return;
     }
 
-    // Barcha boshqa yo'llar (/api/*, /errors, /, /index.html) uchun avtorizatsiyani tekshiramiz
-    const auth = checkAuth(req);
-    const isHtmlRequest =
-      pathname === "/" ||
-      pathname === "/index.html" ||
-      (req.headers.accept && req.headers.accept.includes("text/html"));
-
-    if (!auth.ok) {
-      // Agar ADMIN_PASSWORD belgilanmagan bo'lsa -> 503
-      if (auth.status === 503) {
-        if (isHtmlRequest) {
-          res.writeHead(503, { "Content-Type": "text/html; charset=utf-8" });
-          res.end(render503Page());
-          return;
-        }
-        sendJson(res, 503, {
-          error: "Dashboard yopiq: ADMIN_PASSWORD belgilanmagan",
-          code: "ADMIN_PASSWORD_REQUIRED",
-          message: "Render (yoki .env) Environment sozlamalariga ADMIN_PASSWORD qo'shing. /health ochiq.",
-          health: "/health",
-        });
+    // 1. Statik fayllar va Bosh sahifa (Dashboard HTML) - Har doim 200 OK qaytaradi
+    // Bu orqali AI Studio warmup va iframe to'xtovsiz yuklanadi, dashboard ichida esa parol so'raladi
+    if (pathname === "/" || pathname === "/index.html") {
+      if (fs.existsSync(INDEX_HTML_PATH)) {
+        const html = fs.readFileSync(INDEX_HTML_PATH, "utf-8");
+        res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
+        res.end(html);
         return;
       }
+    }
 
-      // Agar parol noto'g'ri yoki kiritilmagan bo'lsa -> 401 (WWW-Authenticate bilan brauzerda oyna chiqaradi)
+    const safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, "");
+    const filePath = path.join(PUBLIC_DIR, safePath);
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      const ext = path.extname(filePath).toLowerCase();
+      const contentTypes = {
+        ".html": "text/html; charset=utf-8",
+        ".css": "text/css; charset=utf-8",
+        ".js": "application/javascript; charset=utf-8",
+        ".json": "application/json; charset=utf-8",
+        ".svg": "image/svg+xml",
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+      };
+      const contentType = contentTypes[ext] || "application/octet-stream";
+      res.writeHead(200, { "Content-Type": contentType });
+      fs.createReadStream(filePath).pipe(res);
+      return;
+    }
+
+    // 2. BARCHA API va Maxfiy marshrutlar (/api/* va /errors) uchun avtorizatsiyani tekshiramiz
+    const auth = checkAuth(req);
+    if (!auth.ok) {
+      const isPasswordConfigured = Boolean((process.env.ADMIN_PASSWORD || ADMIN_PASSWORD || "").trim());
       const wwwAuthHeader = {
         "WWW-Authenticate": 'Basic realm="Telegram Bot Admin Dashboard", charset="UTF-8"',
       };
 
-      if (isHtmlRequest) {
-        res.writeHead(401, {
-          "Content-Type": "text/html; charset=utf-8",
-          ...wwwAuthHeader,
-        });
-        res.end(render401Page());
-        return;
-      }
-
       sendJson(res, 401, {
-        error: "Ruxsat berilmadi: Parol kiritilmadi yoki noto'g'ri (401 Unauthorized)",
+        error: isPasswordConfigured
+          ? "Ruxsat berilmadi: Parol kiritilmadi yoki noto'g'ri (401 Unauthorized)"
+          : "Dashboard yopiq: ADMIN_PASSWORD belgilanmagan. Server Environment sozlamalariga ADMIN_PASSWORD qo'shing.",
+        code: isPasswordConfigured ? "UNAUTHORIZED" : "ADMIN_PASSWORD_REQUIRED",
         status: 401,
+        adminPasswordConfigured: isPasswordConfigured,
       }, wwwAuthHeader);
       return;
     }
 
     // --- AVTORIZATSIYADAN O'TGAN SO'ROVLAR ---
     try {
-      // 1. /api/status -> Jonli tizim holati va 409 diagnostikasi
+      // /api/status -> Jonli tizim holati va 409 diagnostikasi
       if (req.method === "GET" && pathname === "/api/status") {
         const statsData = getStats();
         sendJson(res, 200, {
@@ -306,7 +256,7 @@ export function startServer() {
         return;
       }
 
-      // 2. /api/activities -> Bot hodisalari
+      // /api/activities -> Bot hodisalari
       if (req.method === "GET" && pathname === "/api/activities") {
         const activities = getActivities();
         sendJson(res, 200, {
@@ -316,7 +266,7 @@ export function startServer() {
         return;
       }
 
-      // 3. /errors va /api/errors -> Xatoliklar
+      // /errors va /api/errors -> Xatoliklar
       if (req.method === "GET" && (pathname === "/errors" || pathname === "/api/errors")) {
         const errors = getErrors();
         sendJson(res, 200, {
@@ -326,7 +276,7 @@ export function startServer() {
         return;
       }
 
-      // 4. /api/errors/clear -> Xatoliklarni tozalash
+      // /api/errors/clear -> Xatoliklarni tozalash
       if (req.method === "POST" && pathname === "/api/errors/clear") {
         clearErrors();
         logActivity({
@@ -339,7 +289,7 @@ export function startServer() {
         return;
       }
 
-      // 5. /api/test-gemini -> Gemini AI'ni test qilish
+      // /api/test-gemini -> Gemini AI'ni test qilish
       if (req.method === "POST" && pathname === "/api/test-gemini") {
         const body = await readBody(req);
         const text = String(body.text || "").trim();
@@ -380,14 +330,14 @@ export function startServer() {
         return;
       }
 
-      // 6. /api/ping-render -> SSRF himoyalangan: faqat o'z Render manzilini tekshiradi
+      // /api/ping-render -> SSRF himoyalangan: faqat o'z Render manzilini tekshiradi
       if (req.method === "POST" && pathname === "/api/ping-render") {
         const pingResult = await pingRender();
         sendJson(res, 200, pingResult);
         return;
       }
 
-      // 6a. /api/polling/toggle -> Polling holatini o'zgartirish (Standby / Active)
+      // /api/polling/toggle -> Polling holatini o'zgartirish (Standby / Active)
       if (req.method === "POST" && pathname === "/api/polling/toggle") {
         const body = await readBody(req);
         let result;
@@ -405,7 +355,7 @@ export function startServer() {
         return;
       }
 
-      // 6b. /api/telegram/reset-webhook -> Webhook va sessiyani tozalash (409 xatosini yechish)
+      // /api/telegram/reset-webhook -> Webhook va sessiyani tozalash (409 xatosini yechish)
       if (req.method === "POST" && pathname === "/api/telegram/reset-webhook") {
         const body = await readBody(req);
         const dropPending = body.dropPending !== false;
@@ -426,7 +376,7 @@ export function startServer() {
         return;
       }
 
-      // 6c. /api/telegram/info -> Bot va Webhook holatini Telegram API orqali tekshirish
+      // /api/telegram/info -> Bot va Webhook holatini Telegram API orqali tekshirish
       if (req.method === "GET" && pathname === "/api/telegram/info") {
         try {
           const diag = await botState.controller.getDiagnostics();
@@ -449,50 +399,11 @@ export function startServer() {
         return;
       }
 
-      // 7. Bosh sahifa (Dashboard UI)
-      if (pathname === "/" || pathname === "/index.html") {
-        if (fs.existsSync(INDEX_HTML_PATH)) {
-          const html = fs.readFileSync(INDEX_HTML_PATH, "utf-8");
-          res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-          res.end(html);
-          return;
-        }
-      }
-
-      // 8. Boshqa statik fayllar (agar public papkasida bo'lsa)
-      const safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, "");
-      const filePath = path.join(PUBLIC_DIR, safePath);
-      if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-        const ext = path.extname(filePath).toLowerCase();
-        const contentTypes = {
-          ".html": "text/html; charset=utf-8",
-          ".css": "text/css; charset=utf-8",
-          ".js": "application/javascript; charset=utf-8",
-          ".json": "application/json; charset=utf-8",
-          ".svg": "image/svg+xml",
-          ".png": "image/png",
-          ".jpg": "image/jpeg",
-        };
-        const contentType = contentTypes[ext] || "application/octet-stream";
-        res.writeHead(200, { "Content-Type": contentType });
-        fs.createReadStream(filePath).pipe(res);
-        return;
-      }
-
-      // Fallback
-      if (fs.existsSync(INDEX_HTML_PATH)) {
-        const html = fs.readFileSync(INDEX_HTML_PATH, "utf-8");
-        res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-        res.end(html);
-        return;
-      }
-
-      res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
-      res.end("Bot ishlayapti");
+      // Boshqa har qanday noma'lum yo'l uchun 404
+      sendJson(res, 404, { error: "Sahifa topilmadi", status: 404 });
     } catch (err) {
       logError("server.request", err);
-      res.writeHead(500, { "Content-Type": "application/json; charset=utf-8" });
-      res.end(JSON.stringify({ error: "Server ichki xatoligi" }));
+      sendJson(res, 500, { error: "Server ichki xatoligi" });
     }
   });
 
