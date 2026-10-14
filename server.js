@@ -6,6 +6,7 @@ import { PORT, BOT_TOKEN, GEMINI_API_KEY, GEMINI_MODEL, SYSTEM_PROMPT } from "./
 import { getErrors, clearErrors, logError } from "./errors.js";
 import { getActivities, getStats, logActivity } from "./activity.js";
 import { askGemini } from "./gemini.js";
+import { botState } from "./botState.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -117,7 +118,7 @@ export function startServer() {
     const pathname = parsedUrl.pathname;
 
     try {
-      // 1. /api/status -> Jonli tizim holati
+      // 1. /api/status -> Jonli tizim holati va 409 diagnostikasi
       if (req.method === "GET" && pathname === "/api/status") {
         const statsData = getStats();
         sendJson(res, 200, {
@@ -131,6 +132,18 @@ export function startServer() {
             geminiModel: GEMINI_MODEL,
             systemPrompt: SYSTEM_PROMPT,
             renderUrl: "https://telegram-bot-imap.onrender.com",
+            port: PORT,
+          },
+          polling: {
+            enabled: botState.isPollingEnabled,
+            status: botState.pollingStatus,
+            conflictCount: botState.conflictCount,
+            lastConflictAt: botState.lastConflictAt,
+            conflictMessage: botState.conflictMessage,
+          },
+          telegram: {
+            botInfo: botState.botInfo,
+            webhookInfo: botState.webhookInfo,
           },
           stats: {
             totalUpdates: statsData.totalUpdates,
@@ -138,11 +151,12 @@ export function startServer() {
             geminiReplies: statsData.geminiReplies,
             errorsCount: statsData.errorsCount,
             lastActivityAt: statsData.lastActivityAt,
-            botUsername: statsData.botUsername,
+            botUsername: statsData.botUsername || botState.botInfo?.username,
           },
         });
         return;
       }
+
 
       // 2. /api/activities -> Bot hodisalari
       if (req.method === "GET" && pathname === "/api/activities") {
@@ -226,6 +240,69 @@ export function startServer() {
         sendJson(res, 200, pingResult);
         return;
       }
+
+      // 6a. /api/polling/toggle -> Polling holatini o'zgartirish (Standby / Active)
+      if (req.method === "POST" && pathname === "/api/polling/toggle") {
+        const body = await readBody(req);
+        let result;
+        if (body.action === "pause" || (botState.isPollingEnabled && body.action !== "resume")) {
+          result = await botState.controller.pause();
+        } else {
+          result = await botState.controller.resume();
+        }
+        sendJson(res, 200, {
+          success: true,
+          isPollingEnabled: botState.isPollingEnabled,
+          pollingStatus: botState.pollingStatus,
+          result,
+        });
+        return;
+      }
+
+      // 6b. /api/telegram/reset-webhook -> Webhook va sessiyani tozalash (409 xatosini yechish)
+      if (req.method === "POST" && pathname === "/api/telegram/reset-webhook") {
+        const body = await readBody(req);
+        const dropPending = body.dropPending !== false;
+        try {
+          const resDrop = await botState.controller.resetWebhook(dropPending);
+          sendJson(res, 200, {
+            success: true,
+            message: "Telegram sessiya va webhook tozalandi. Qulflar bo'shatildi.",
+            dropPending,
+            resDrop,
+          });
+        } catch (err) {
+          sendJson(res, 500, {
+            success: false,
+            error: err?.message || "Webhookni tozalashda xatolik",
+          });
+        }
+        return;
+      }
+
+      // 6c. /api/telegram/info -> Bot va Webhook holatini Telegram API orqali tekshirish
+      if (req.method === "GET" && pathname === "/api/telegram/info") {
+        try {
+          const diag = await botState.controller.getDiagnostics();
+          sendJson(res, 200, {
+            success: true,
+            pollingStatus: botState.pollingStatus,
+            isPollingEnabled: botState.isPollingEnabled,
+            conflictCount: botState.conflictCount,
+            lastConflictAt: botState.lastConflictAt,
+            botInfo: botState.botInfo,
+            webhookInfo: botState.webhookInfo,
+            diag,
+          });
+        } catch (err) {
+          sendJson(res, 500, {
+            success: false,
+            error: err?.message || "Telegram ma'lumotlarini olishda xatolik",
+          });
+        }
+        return;
+      }
+
 
       // 7. Bosh sahifa (Dashboard UI)
       if (pathname === "/" || pathname === "/index.html") {

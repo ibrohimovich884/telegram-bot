@@ -4,10 +4,11 @@
   "type": "module",
   "main": "bot.js",
   "scripts": {
-    "build": "node --check bot.js server.js config.js errors.js gemini.js handlers.js activity.js",
+    "build": "node --check bot.js server.js config.js errors.js gemini.js handlers.js activity.js botState.js",
     "dev": "node bot.js",
-    "lint": "node --check bot.js server.js config.js errors.js gemini.js handlers.js activity.js",
+    "lint": "node --check bot.js server.js config.js errors.js gemini.js handlers.js activity.js botState.js",
     "start": "node bot.js"
+
   },
   "engines": {
     "node": ">=20"
