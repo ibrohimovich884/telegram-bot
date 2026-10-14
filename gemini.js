@@ -8,10 +8,12 @@ function getAiClient() {
   return new GoogleGenAI(key ? { apiKey: key } : {});
 }
 
-// 503/429 bo'lsa fallback model va qayta urinish bilan ishlaydi
+// 404, 503 yoki 429 bo'lsa zaxira model va qayta urinish bilan ishlaydi
 export async function askGemini(text) {
   const modelsToTry = [
     GEMINI_MODEL,
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-lite",
     "gemini-3.1-flash-lite",
     "gemini-flash-latest"
   ];
@@ -22,7 +24,11 @@ export async function askGemini(text) {
   let lastError = null;
 
   for (const model of uniqueModels) {
+    let modelUnavailable = false;
+
     for (let attempt = 1; attempt <= 2; attempt++) {
+      if (modelUnavailable) break;
+
       try {
         const result = await ai.models.generateContent({
           model,
@@ -34,22 +40,44 @@ export async function askGemini(text) {
         }
       } catch (err) {
         lastError = err;
-        const msg = String(err?.message ?? err);
-        const retryable =
-          [429, 500, 503].includes(err?.status) ||
-          msg.includes("UNAVAILABLE") ||
-          msg.includes("RESOURCE_EXHAUSTED") ||
-          msg.includes("high demand");
+        const msg = String(err?.message ?? err).toLowerCase();
+        const status = err?.status;
 
-        if (!retryable) {
-          throw err;
+        // Model topilmagan bo'lsa (404 NOT_FOUND, model o'chirilgan yoki mavjud emas):
+        // Shu modelni qayta urinmasdan DARHOL keyingi zaxira modelga o'tadi
+        const isNotFound =
+          status === 404 ||
+          msg.includes("404") ||
+          msg.includes("not found") ||
+          msg.includes("not_found") ||
+          msg.includes("is not found for api version") ||
+          msg.includes("unsupported model");
+
+        if (isNotFound) {
+          console.warn(`[GEMINI] Model ${model} topilmadi (404 Not Found). Keyingi zaxira modelga o'tilmoqda...`);
+          modelUnavailable = true;
+          break;
         }
 
-        console.log(`[GEMINI] ${model} (${attempt}-urinish) vaqtincha band: ${err?.status || '503'}, keyingi variant tekshirilmoqda...`);
+        const retryable =
+          [429, 500, 503].includes(status) ||
+          msg.includes("unavailable") ||
+          msg.includes("resource_exhausted") ||
+          msg.includes("high demand") ||
+          msg.includes("quota") ||
+          msg.includes("overloaded");
+
+        if (!retryable) {
+          console.warn(`[GEMINI] ${model} xatolik berdi (${err?.message || err}). Keyingi model tekshiriladi...`);
+          modelUnavailable = true;
+          break;
+        }
+
+        console.log(`[GEMINI] ${model} (${attempt}-urinish) vaqtincha band: ${status || '503'}, qayta urinilmoqda...`);
         await sleep(attempt * 1000);
       }
     }
   }
 
-  throw lastError || new Error("Gemini AI javob qaytara olmadi");
+  throw lastError || new Error("Gemini AI javob qaytara olmadi (barcha zaxira modellar tekshirildi)");
 }
