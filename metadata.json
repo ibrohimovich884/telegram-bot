@@ -1,0 +1,8 @@
+{
+  "name": "Telegram Business Bot",
+  "description": "Telegram business bot powered by Gemini AI with auto-reply and error logging.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

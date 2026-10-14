@@ -1,4 +1,5 @@
 import { BOT_TOKEN, GEMINI_API_KEY } from "./config.js";
+import { logActivity } from "./activity.js";
 
 const MAX_ERRORS = 50;
 const errors = [];
@@ -22,10 +23,28 @@ export function logError(where, err) {
   errors.unshift(entry);
   if (errors.length > MAX_ERRORS) errors.pop();
   console.error(`[XATO] ${entry.time} | ${where} | ${entry.message}`);
+
+  // Faoliyat jurnaliga ham qo'shamiz
+  try {
+    logActivity({
+      type: "error",
+      title: `Xatolik: ${where}`,
+      details: entry.message,
+      status: "error",
+      metadata: { where },
+    });
+  } catch {
+    // xatolik ichida xato bo'lsa indamaymiz
+  }
 }
 
 export function getErrors() {
   return errors;
+}
+
+export function clearErrors() {
+  errors.length = 0;
+  return true;
 }
 
 process.on("uncaughtException", (err) => logError("uncaughtException", err));
