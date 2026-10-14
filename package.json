@@ -4,9 +4,9 @@
   "type": "module",
   "main": "bot.js",
   "scripts": {
-    "build": "node --check bot.js server.js config.js errors.js gemini.js handlers.js activity.js botState.js",
+    "build": "node --check bot.js server.js config.js errors.js gemini.js handlers.js activity.js botState.js prompt.js",
     "dev": "node bot.js",
-    "lint": "node --check bot.js server.js config.js errors.js gemini.js handlers.js activity.js botState.js",
+    "lint": "node --check bot.js server.js config.js errors.js gemini.js handlers.js activity.js botState.js prompt.js",
     "start": "node bot.js"
 
   },
