@@ -75,7 +75,7 @@ const SYSTEM_PROMPT =
                                                                                                   }
 
                                                                                                       const result = await ai.models.generateContent({
-                                                                                                            model: "gemini-2.5-flash",
+                                                                                                            model: "gemini-3.8-flash",
                                                                                                                   contents: ctx.msg.text,
                                                                                                                         config: { systemInstruction: SYSTEM_PROMPT },
                                                                                                                             });
@@ -119,4 +119,3 @@ const SYSTEM_PROMPT =
                                                                                                                                                                                                                     onStart: (info) => console.log(`Bot ishga tushdi: @${info.username}`),
                                                                                                                                                                                                                       })
                                                                                                                                                                                                                         .catch((err) => logError("bot.start", err));
-                                                                                                                                                                                                                        
