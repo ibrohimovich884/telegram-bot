@@ -1,5 +1,6 @@
 import { sendJson } from "../../utils/http.js";
 import { getStats } from "../../services/activity.service.js";
+import { getMemoryStats } from "../../services/memory.service.js";
 import { botState } from "../../bot/state.js";
 import {
   PORT,
@@ -11,16 +12,19 @@ import {
 } from "../../config/index.js";
 
 /**
- * GET /api/status -> Jonli tizim holati, bot parametrlari va diagnostika
+ * GET /api/status -> Jonli tizim holati, bot parametrlari, xotira va diagnostika
  * @param {import("node:http").IncomingMessage} req
  * @param {import("node:http").ServerResponse} res
  */
 export function handleStatusRoute(req, res) {
   if (req.method === "GET") {
     const statsData = getStats();
+    const memoryStats = getMemoryStats();
+
     sendJson(res, 200, {
       status: "online",
       ...statsData,
+      memoryStats,
       nodeVersion: process.version,
       platform: process.platform,
       botConfig: {

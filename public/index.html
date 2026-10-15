@@ -102,6 +102,7 @@
       <!-- Desktop Navigatsiya -->
       <nav class="hidden md:flex items-center gap-5 text-xs font-medium text-slate-300">
         <a href="#overview" class="hover:text-white transition-colors">Monitoring</a>
+        <a href="#memory-section" class="hover:text-white transition-colors text-sky-400 font-semibold">Xotira</a>
         <a href="#render-section" class="hover:text-white transition-colors">Render Tekshiruvi</a>
         <a href="#simulator" class="hover:text-white transition-colors">Gemini Sinov</a>
         <a href="#activity-section" class="hover:text-white transition-colors">Faoliyat</a>
@@ -233,7 +234,7 @@
         </div>
 
         <!-- KPI METRIC KARTALARI (375px ekranda bitta ustunda qulay sig'adi) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 sm:gap-4">
           
           <!-- KPI 1: Bot Status -->
           <div class="p-3.5 sm:p-4 rounded-xl bg-surface-card border border-surface-border flex flex-col justify-between">
@@ -283,7 +284,22 @@
             </div>
           </div>
 
-          <!-- KPI 4: Render Deployment -->
+          <!-- KPI 4: Foydalanuvchilar Xotirasi -->
+          <div class="p-3.5 sm:p-4 rounded-xl bg-surface-card border border-surface-border flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-2">
+              <span class="text-xs font-medium text-slate-400">Mijozlar Xotirasi</span>
+              <span class="text-xs font-mono text-emerald-400" id="badge-memory-status">Alohida</span>
+            </div>
+            <div class="mt-2.5 sm:mt-3">
+              <div id="metric-memory-users" class="text-lg sm:text-2xl font-bold font-mono tabular-nums text-white">0</div>
+              <div class="mt-0.5 text-[11px] text-slate-400 flex items-center gap-1.5">
+                <span>Xotiradagi xabarlar:</span>
+                <span id="metric-memory-turns" class="font-mono tabular-nums text-slate-300">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 5: Render Deployment -->
           <div class="p-3.5 sm:p-4 rounded-xl bg-surface-card border border-surface-border flex flex-col justify-between">
             <div class="flex items-start justify-between gap-2">
               <span class="text-xs font-medium text-slate-400">Render Server</span>
@@ -383,7 +399,74 @@
         </div>
       </section>
 
-      <!-- BO'LIM 2: RENDER PRODUCTION PROBER (375px ekranga mos) -->
+      <!-- BO'LIM 2: FOYDALANUVCHILAR XOTIRASI (ALOHIDA XOTIRA TIZIMI) -->
+      <section id="memory-section" class="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-surface-card border border-surface-border space-y-3.5 sm:space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-surface-border/70">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </span>
+              <h2 class="text-sm sm:text-base font-bold text-white">Foydalanuvchilar Xotirasi (Alohida Xotira)</h2>
+              <span id="badge-total-memory-users" class="px-2 py-0.5 text-[11px] font-mono rounded bg-sky-950/60 border border-sky-700/50 text-sky-300">0 ta mijoz</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">
+              Har bir foydalanuvchi ma'lumoti mutlaqo alohida saqlanadi. Bir user suhbati boshqa userga aralashmaydi.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btn-refresh-memory" type="button" class="px-2.5 py-1.5 text-xs font-medium text-slate-300 bg-[#090d16] border border-surface-border rounded-lg hover:text-white transition-colors flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              Yangilash
+            </button>
+            <button id="btn-clear-all-memory" type="button" class="px-2.5 py-1.5 text-xs font-medium text-rose-400 bg-rose-950/20 border border-rose-900/40 rounded-lg hover:bg-rose-950/50 transition-colors">
+              Barchasini tozalash
+            </button>
+          </div>
+        </div>
+
+        <!-- Statistika va qidiruv -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          <div class="p-2.5 rounded-xl bg-[#090d16] border border-surface-border flex items-center justify-between">
+            <span class="text-xs text-slate-400">Xotiradagi mijozlar:</span>
+            <span id="lbl-total-users" class="text-xs font-bold font-mono text-white">0</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-[#090d16] border border-surface-border flex items-center justify-between">
+            <span class="text-xs text-slate-400">Jami saqlangan xabarlar:</span>
+            <span id="lbl-total-memory-messages" class="text-xs font-bold font-mono text-sky-400">0</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-[#090d16] border border-surface-border flex items-center justify-between">
+            <span class="text-xs text-slate-400">24 soatda faol:</span>
+            <span id="lbl-active-24h" class="text-xs font-bold font-mono text-emerald-400">0</span>
+          </div>
+        </div>
+
+        <!-- Qidiruv paneli -->
+        <div class="flex items-center gap-2">
+          <div class="relative flex-1">
+            <input 
+              type="text" 
+              id="memory-search-input" 
+              placeholder="Mijoz ismi yoki ID bo'yicha qidirish..." 
+              class="w-full h-9 pl-8 pr-3 bg-[#090d16] border border-surface-border rounded-lg text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500"
+            />
+            <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Foydalanuvchilar ro'yxati -->
+        <div id="memory-users-container" class="space-y-2 max-h-[350px] overflow-y-auto pr-0.5">
+          <div class="p-6 text-center text-xs text-slate-500 border border-dashed border-surface-border rounded-xl">
+            Xotira yuklanmoqda...
+          </div>
+        </div>
+      </section>
+
+      <!-- BO'LIM 3: RENDER PRODUCTION PROBER (375px ekranga mos) -->
       <section id="render-section" class="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-surface-card border border-surface-border space-y-3.5 sm:space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
@@ -467,14 +550,50 @@
           </div>
         </div>
 
+        <!-- Simulyatsiya uchun foydalanuvchini tanlash (Alohida xotira testi) -->
+        <div class="p-2.5 rounded-xl bg-[#090d16] border border-surface-border space-y-2">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="text-xs font-semibold text-slate-300">Xotira Sinovi (Foydalanuvchi):</span>
+              <select id="sim-user-select" class="h-8 px-2.5 bg-surface-elevated border border-surface-border rounded-lg text-slate-200 text-xs font-mono focus:outline-none focus:border-sky-500">
+                <option value="user_ali">Mijoz 1: Ali (user_ali)</option>
+                <option value="user_vali">Mijoz 2: Vali (user_vali)</option>
+                <option value="custom">Boshqa ID...</option>
+              </select>
+              <input 
+                type="text" 
+                id="sim-user-custom" 
+                placeholder="Masalan: user_777" 
+                class="hidden h-8 w-32 px-2.5 bg-surface-card border border-surface-border rounded-lg text-slate-200 text-xs font-mono focus:outline-none focus:border-sky-500" 
+              />
+            </div>
+            <div class="flex items-center gap-2.5">
+              <label class="flex items-center gap-1.5 text-xs text-slate-300 cursor-pointer select-none">
+                <input type="checkbox" id="sim-use-memory" checked class="w-3.5 h-3.5 rounded border-slate-700 bg-slate-900 text-sky-600 focus:ring-sky-500">
+                <span>Xotiradan foydalanish</span>
+              </label>
+              <button type="button" id="btn-sim-clear-current" class="px-2.5 py-1 text-[11px] font-medium text-rose-400 bg-rose-950/20 border border-rose-900/40 rounded-lg hover:bg-rose-950/40 transition-colors">
+                Bu mijoz xotirasini tozalash
+              </button>
+            </div>
+          </div>
+          <div class="text-[11px] text-slate-400 flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+            <span>Ushbu mijoz xotiradagi xabarlari: <strong id="sim-current-user-turns" class="text-sky-300 font-mono">0 ta</strong></span>
+          </div>
+        </div>
+
         <!-- Namunalar (375px da toza wrap) -->
         <div class="flex flex-col sm:flex-row sm:flex-wrap gap-1.5">
           <span class="text-[11px] text-slate-500 shrink-0 self-center">Namunalar:</span>
           <button type="button" class="quick-prompt-btn px-2.5 py-1 text-left text-xs rounded bg-surface-elevated text-slate-300 hover:text-white transition-colors truncate max-w-full">
-            Salom, do'koningiz ochiqmi?
+            Mening ismim Ali, Toshkentdaman
           </button>
           <button type="button" class="quick-prompt-btn px-2.5 py-1 text-left text-xs rounded bg-surface-elevated text-slate-300 hover:text-white transition-colors truncate max-w-full">
-            Assalomu alaykum, narxlar qancha?
+            Mening ismim nima va qayerdaman?
+          </button>
+          <button type="button" class="quick-prompt-btn px-2.5 py-1 text-left text-xs rounded bg-surface-elevated text-slate-300 hover:text-white transition-colors truncate max-w-full">
+            Assalomu alaykum, do'koningiz ochiqmi?
           </button>
         </div>
 
@@ -623,6 +742,35 @@
     </div>
   </footer>
 
+  <!-- DIALOG SUHBAT TARIXI MODALI (Alohida xotira ko'rigi) -->
+  <div id="dialog-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/75 backdrop-blur-sm">
+    <div class="w-full max-w-lg rounded-2xl bg-surface-card border border-surface-border shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
+      <div class="p-4 border-b border-surface-border flex items-center justify-between bg-surface-canvas/80">
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <h3 id="modal-user-title" class="text-sm font-bold text-white truncate">Suhbat Tarixi</h3>
+            <span id="modal-turns-count" class="px-2 py-0.5 text-[11px] font-mono rounded bg-sky-950/60 border border-sky-800/50 text-sky-300 shrink-0">0 ta xabar</span>
+          </div>
+          <p id="modal-user-subtitle" class="text-[11px] text-slate-400 font-mono mt-0.5 truncate">Foydalanuvchi ID: --</p>
+        </div>
+        <button id="btn-close-modal" type="button" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-surface-elevated transition-colors shrink-0">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div id="modal-turns-list" class="p-4 space-y-3 overflow-y-auto flex-1 font-sans text-xs min-h-[160px]">
+        <!-- Dialog xabarlari -->
+      </div>
+
+      <div class="p-3 border-t border-surface-border bg-surface-canvas/80 flex items-center justify-between gap-2">
+        <span class="text-[11px] text-slate-400">Har bir foydalanuvchi xotirasi to'liq alohida saqlanadi.</span>
+        <button id="btn-modal-clear-user" type="button" class="px-3 py-1.5 text-xs font-semibold text-rose-400 bg-rose-950/30 border border-rose-900/50 rounded-lg hover:bg-rose-950/60 transition-colors shrink-0">
+          Xotirani Tozalash
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST XABARNOMALAR (375px ekranga mos chap/o'ng paddinglar bilan) -->
   <div id="toast-container" class="fixed bottom-3 left-3 right-3 sm:left-auto sm:right-5 sm:w-96 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
@@ -693,6 +841,38 @@
       const btnRefreshAllEl = document.getElementById('btn-refresh-all');
       const btnClearErrorsEl = document.getElementById('btn-clear-errors');
       const btnCopyErrorsEl = document.getElementById('btn-copy-errors');
+
+      // Xotira (Memory) boshqaruvi elementlari
+      const metricMemoryUsersEl = document.getElementById('metric-memory-users');
+      const metricMemoryTurnsEl = document.getElementById('metric-memory-turns');
+      const badgeMemoryStatusEl = document.getElementById('badge-memory-status');
+      const badgeTotalMemoryUsersEl = document.getElementById('badge-total-memory-users');
+      const lblTotalUsersEl = document.getElementById('lbl-total-users');
+      const lblTotalMemoryMessagesEl = document.getElementById('lbl-total-memory-messages');
+      const lblActive24hEl = document.getElementById('lbl-active-24h');
+      const memorySearchInputEl = document.getElementById('memory-search-input');
+      const memoryUsersContainerEl = document.getElementById('memory-users-container');
+      const btnRefreshMemoryEl = document.getElementById('btn-refresh-memory');
+      const btnClearAllMemoryEl = document.getElementById('btn-clear-all-memory');
+
+      // Dialog Modal elementlari
+      const dialogModalEl = document.getElementById('dialog-modal');
+      const modalUserTitleEl = document.getElementById('modal-user-title');
+      const modalUserSubtitleEl = document.getElementById('modal-user-subtitle');
+      const modalTurnsCountEl = document.getElementById('modal-turns-count');
+      const modalTurnsListEl = document.getElementById('modal-turns-list');
+      const btnCloseModalEl = document.getElementById('btn-close-modal');
+      const btnModalClearUserEl = document.getElementById('btn-modal-clear-user');
+      let currentModalUserId = null;
+
+      // Simulyator xotira elementlari
+      const simUserSelectEl = document.getElementById('sim-user-select');
+      const simUserCustomEl = document.getElementById('sim-user-custom');
+      const simUseMemoryEl = document.getElementById('sim-use-memory');
+      const btnSimClearCurrentEl = document.getElementById('btn-sim-clear-current');
+      const simCurrentUserTurnsEl = document.getElementById('sim-current-user-turns');
+
+      let cachedMemoryUsers = [];
 
       // Autentifikatsiya elementlari
       const loginViewEl = document.getElementById('login-view');
@@ -828,6 +1008,7 @@
           fetchStatus();
           fetchActivities();
           fetchErrors();
+          fetchMemory();
         }, 3000);
       }
 
@@ -880,6 +1061,7 @@
             fetchStatus();
             fetchActivities();
             fetchErrors();
+            fetchMemory();
             pingRenderServer();
           } else {
             if (loginErrorBoxEl) {
@@ -919,6 +1101,15 @@
           if (metricBusinessMessagesEl) metricBusinessMessagesEl.textContent = (data.stats.businessMessages || 0).toLocaleString();
           if (metricRepliesEl) metricRepliesEl.textContent = (data.stats.geminiReplies || 0).toLocaleString();
           if (badgeConnectionCountEl) badgeConnectionCountEl.textContent = `${data.businessConnectionsCount || 0} ta ulanish`;
+
+          if (data.memoryStats) {
+            if (metricMemoryUsersEl) metricMemoryUsersEl.textContent = `${data.memoryStats.totalUsers || 0}`;
+            if (metricMemoryTurnsEl) metricMemoryTurnsEl.textContent = `${data.memoryStats.totalMessages || 0}`;
+            if (lblTotalUsersEl) lblTotalUsersEl.textContent = `${data.memoryStats.totalUsers || 0}`;
+            if (lblTotalMemoryMessagesEl) lblTotalMemoryMessagesEl.textContent = `${data.memoryStats.totalMessages || 0}`;
+            if (lblActive24hEl) lblActive24hEl.textContent = `${data.memoryStats.activeWithin24h || 0}`;
+            if (badgeTotalMemoryUsersEl) badgeTotalMemoryUsersEl.textContent = `${data.memoryStats.totalUsers || 0} ta mijoz`;
+          }
 
           if (data.botConfig && data.botConfig.hasBotToken) {
             if (badgeBotStatusEl) {
@@ -1157,11 +1348,59 @@
         }
       }
 
-      // Gemini AI Test Form
+      // Gemini AI Test Form (Har bir foydalanuvchi uchun alohida xotira bilan)
+      function getSelectedSimUserId() {
+        if (!simUserSelectEl) return null;
+        const val = simUserSelectEl.value;
+        if (val === 'custom') {
+          return (simUserCustomEl?.value || '').trim() || 'user_custom';
+        }
+        return val;
+      }
+
+      function getSelectedSimUserName() {
+        const uid = getSelectedSimUserId();
+        if (uid === 'user_ali') return 'Ali (Sinov)';
+        if (uid === 'user_vali') return 'Vali (Sinov)';
+        return `Mijoz (${uid})`;
+      }
+
+      function updateSimUserTurns() {
+        if (!simCurrentUserTurnsEl) return;
+        const uid = getSelectedSimUserId();
+        const found = cachedMemoryUsers.find(u => String(u.userId) === String(uid));
+        const count = found ? (found.turnsCount || 0) : 0;
+        simCurrentUserTurnsEl.textContent = `${count} ta`;
+      }
+
+      simUserSelectEl?.addEventListener('change', () => {
+        if (!simUserSelectEl) return;
+        if (simUserSelectEl.value === 'custom') {
+          simUserCustomEl?.classList.remove('hidden');
+          simUserCustomEl?.focus();
+        } else {
+          simUserCustomEl?.classList.add('hidden');
+        }
+        updateSimUserTurns();
+      });
+
+      simUserCustomEl?.addEventListener('input', updateSimUserTurns);
+
+      btnSimClearCurrentEl?.addEventListener('click', async () => {
+        const uid = getSelectedSimUserId();
+        if (!uid) return;
+        await clearSpecificUserMemory(uid);
+        updateSimUserTurns();
+      });
+
       geminiTestFormEl?.addEventListener('submit', async function (e) {
         e.preventDefault();
         const text = (geminiInputTextEl?.value || '').trim();
         if (!text) return;
+
+        const uid = getSelectedSimUserId();
+        const uName = getSelectedSimUserName();
+        const useMemory = simUseMemoryEl ? simUseMemoryEl.checked : true;
 
         geminiSpinnerEl?.classList.remove('hidden');
         if (btnGeminiSubmitEl) btnGeminiSubmitEl.disabled = true;
@@ -1175,14 +1414,20 @@
           const res = await apiFetch('/api/test-gemini', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text }),
+            body: JSON.stringify({
+              text,
+              userId: useMemory ? uid : null,
+              userName: useMemory ? uName : null,
+              disableMemory: !useMemory,
+            }),
           });
 
           const data = await res.json();
           const ms = Math.round(performance.now() - t0);
 
           if (data.success && geminiReplyContentEl) {
-            if (geminiLatencyLabelEl) geminiLatencyLabelEl.textContent = `${data.durationMs || ms} ms`;
+            const memoryBadge = useMemory && data.userId ? ` <span class="text-[10px] text-sky-400 font-mono">(${data.userId} xotirasi: ${data.turnsCount || 0} ta)</span>` : '';
+            if (geminiLatencyLabelEl) geminiLatencyLabelEl.innerHTML = `${data.durationMs || ms} ms${memoryBadge}`;
             geminiReplyContentEl.textContent = data.reply;
           } else if (geminiReplyContentEl) {
             if (geminiLatencyLabelEl) geminiLatencyLabelEl.textContent = 'Xatolik';
@@ -1191,6 +1436,7 @@
 
           fetchStatus();
           fetchActivities();
+          fetchMemory();
         } catch (err) {
           if (geminiReplyContentEl) {
             geminiReplyContentEl.innerHTML = `<span class="text-rose-400 text-xs">Tarmoq xatosi: ${escapeHtml(err.message)}</span>`;
@@ -1201,6 +1447,235 @@
           if (geminiBtnTextEl) geminiBtnTextEl.textContent = 'AI Javobini Olish';
         }
       });
+
+      // Foydalanuvchilar xotirasini olish va ko'rsatish
+      async function fetchMemory() {
+        try {
+          const res = await apiFetch('/api/memory');
+          if (!res.ok) return;
+          const data = await res.json();
+          cachedMemoryUsers = data.users || [];
+          if (data.stats) {
+            if (metricMemoryUsersEl) metricMemoryUsersEl.textContent = `${data.stats.totalUsers || 0}`;
+            if (metricMemoryTurnsEl) metricMemoryTurnsEl.textContent = `${data.stats.totalMessages || 0}`;
+            if (lblTotalUsersEl) lblTotalUsersEl.textContent = `${data.stats.totalUsers || 0}`;
+            if (lblTotalMemoryMessagesEl) lblTotalMemoryMessagesEl.textContent = `${data.stats.totalMessages || 0}`;
+            if (lblActive24hEl) lblActive24hEl.textContent = `${data.stats.activeWithin24h || 0}`;
+            if (badgeTotalMemoryUsersEl) badgeTotalMemoryUsersEl.textContent = `${data.stats.totalUsers || 0} ta mijoz`;
+          }
+          renderMemoryUsers();
+          updateSimUserTurns();
+        } catch {}
+      }
+
+      function renderMemoryUsers() {
+        if (!memoryUsersContainerEl) return;
+        const q = (memorySearchInputEl?.value || '').trim().toLowerCase();
+        let items = cachedMemoryUsers;
+        if (q) {
+          items = items.filter(u =>
+            (u.userName && u.userName.toLowerCase().includes(q)) ||
+            (u.userId && u.userId.toLowerCase().includes(q)) ||
+            (u.username && u.username.toLowerCase().includes(q)) ||
+            (u.lastMessage && u.lastMessage.toLowerCase().includes(q))
+          );
+        }
+
+        if (items.length === 0) {
+          memoryUsersContainerEl.innerHTML = `
+            <div class="p-6 text-center text-xs text-slate-500 border border-dashed border-surface-border rounded-xl">
+              ${q ? 'Qidiruv bo\'yicha hech qanday mijoz xotirasi topilmadi.' : 'Hozircha xotirada hech qanday mijoz yo\'q. Telegram orqali xabar kelganda yoki yuqoridagi simulyatordan sinab ko\'rganingizda alohida xotira shakllanadi.'}
+            </div>
+          `;
+          return;
+        }
+
+        memoryUsersContainerEl.innerHTML = items.map(user => {
+          const senderName = user.userName || `Mijoz #${user.userId}`;
+          const lastMsg = user.lastMessage ? `"${escapeHtml(user.lastMessage)}"` : '(Suhbat yangi boshlangan)';
+          const roleLabel = user.lastRole === 'user' ? 'Mijoz' : 'Gemini AI';
+          const roleBadgeColor = user.lastRole === 'user' ? 'text-sky-400 bg-sky-950/40' : 'text-emerald-400 bg-emerald-950/40';
+
+          return `
+            <div class="p-3 rounded-xl bg-[#090d16] border border-surface-border hover:border-slate-700 transition-all space-y-2">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                <div class="flex items-center gap-2 min-w-0">
+                  <div class="w-8 h-8 rounded-lg bg-surface-elevated border border-surface-border flex items-center justify-center font-bold text-xs text-sky-400 shrink-0">
+                    ${escapeHtml(senderName.charAt(0).toUpperCase())}
+                  </div>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <span class="text-xs font-bold text-white truncate">${escapeHtml(senderName)}</span>
+                      ${user.username ? `<span class="text-[11px] text-sky-400 font-mono">${escapeHtml(user.username)}</span>` : ''}
+                      <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-surface-card border border-surface-border text-slate-400">ID: ${escapeHtml(user.userId)}</span>
+                    </div>
+                    <div class="text-[11px] text-slate-500 flex items-center gap-2 mt-0.5">
+                      <span>Xotirada: <strong class="text-slate-300 font-mono">${user.turnsCount || 0} ta xabar</strong></span>
+                      <span aria-hidden="true">·</span>
+                      <span>Oxirgi faollik: <span class="font-mono tabular-nums text-slate-400">${formatTime(user.updatedAt)}</span></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
+                  <button type="button" class="btn-view-dialog px-2.5 py-1 text-xs font-semibold text-sky-300 bg-sky-950/40 hover:bg-sky-900/50 border border-sky-800/50 rounded-lg transition-colors flex items-center gap-1" data-userid="${escapeHtml(user.userId)}">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    Suhbatni ko'rish
+                  </button>
+                  <button type="button" class="btn-clear-user-memory p-1 text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 rounded-lg transition-colors" title="Ushbu foydalanuvchi xotirasini tozalash" data-userid="${escapeHtml(user.userId)}">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Oxirgi xabar ko'rinishi -->
+              <div class="p-2 rounded bg-surface-canvas border border-surface-border/40 text-[11px] flex items-center justify-between gap-2">
+                <span class="text-slate-400 truncate flex-1">
+                  <span class="px-1.5 py-0.5 rounded font-mono text-[10px] mr-1 ${roleBadgeColor}">${roleLabel}:</span>
+                  ${lastMsg}
+                </span>
+                <span class="text-[10px] text-slate-500 font-mono shrink-0">${formatTime(user.lastTimestamp)}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Suhbatni ko'rish tugmalari
+        memoryUsersContainerEl.querySelectorAll('.btn-view-dialog').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const uid = btn.getAttribute('data-userid');
+            if (uid) openUserDialogModal(uid);
+          });
+        });
+
+        // Individual xotirani tozalash
+        memoryUsersContainerEl.querySelectorAll('.btn-clear-user-memory').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const uid = btn.getAttribute('data-userid');
+            if (uid) clearSpecificUserMemory(uid);
+          });
+        });
+      }
+
+      async function openUserDialogModal(userId) {
+        if (!dialogModalEl) return;
+        currentModalUserId = userId;
+        if (modalUserTitleEl) modalUserTitleEl.textContent = 'Yuklanmoqda...';
+        if (modalUserSubtitleEl) modalUserSubtitleEl.textContent = `Foydalanuvchi ID: ${userId}`;
+        if (modalTurnsCountEl) modalTurnsCountEl.textContent = '...';
+        if (modalTurnsListEl) {
+          modalTurnsListEl.innerHTML = '<div class="text-center py-6 text-slate-500 text-xs">Suhbat xotirasi yuklanmoqda...</div>';
+        }
+        dialogModalEl.classList.remove('hidden');
+
+        try {
+          const res = await apiFetch(`/api/memory?userId=${encodeURIComponent(userId)}`);
+          const data = await res.json();
+          if (data.success && data.user) {
+            const u = data.user;
+            if (modalUserTitleEl) modalUserTitleEl.textContent = u.userName || `Mijoz #${u.userId}`;
+            if (modalUserSubtitleEl) modalUserSubtitleEl.textContent = `ID: ${u.userId} ${u.username ? '(' + u.username + ')' : ''}`;
+            const turns = u.turns || [];
+            if (modalTurnsCountEl) modalTurnsCountEl.textContent = `${turns.length} ta xabar`;
+
+            if (turns.length === 0) {
+              modalTurnsListEl.innerHTML = '<div class="text-center py-6 text-slate-500 text-xs">Ushbu foydalanuvchida hali xabarlar yo\'q.</div>';
+              return;
+            }
+
+            modalTurnsListEl.innerHTML = turns.map(t => {
+              const isUser = t.role === 'user';
+              return `
+                <div class="flex flex-col ${isUser ? 'items-end' : 'items-start'} space-y-1">
+                  <div class="flex items-center gap-1.5 text-[10px] text-slate-400 font-mono">
+                    <span>${isUser ? (u.userName || 'Mijoz') : 'Gemini AI'}</span>
+                    <span aria-hidden="true">·</span>
+                    <span>${formatTime(t.timestamp)}</span>
+                    ${t.durationMs ? `<span class="text-slate-500">(${t.durationMs}ms)</span>` : ''}
+                  </div>
+                  <div class="max-w-[85%] p-3 rounded-2xl text-xs leading-relaxed break-words whitespace-pre-wrap ${
+                    isUser
+                      ? 'bg-sky-600 text-white rounded-tr-none shadow-md shadow-sky-950'
+                      : 'bg-surface-elevated text-slate-200 border border-surface-border rounded-tl-none'
+                  }">
+                    ${escapeHtml(t.text)}
+                  </div>
+                </div>
+              `;
+            }).join('');
+
+            modalTurnsListEl.scrollTop = modalTurnsListEl.scrollHeight;
+          } else {
+            modalTurnsListEl.innerHTML = '<div class="text-center py-6 text-rose-400 text-xs">Xotira topilmadi yoki tozalangan.</div>';
+          }
+        } catch (err) {
+          modalTurnsListEl.innerHTML = `<div class="text-center py-6 text-rose-400 text-xs">Xatolik: ${escapeHtml(err.message)}</div>`;
+        }
+      }
+
+      async function clearSpecificUserMemory(userId) {
+        try {
+          const res = await apiFetch('/api/memory/clear', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId }),
+          });
+          const d = await res.json();
+          if (d.success) {
+            showToast(`Foydalanuvchi (${userId}) xotirasi tozalandi`, 'success');
+            if (currentModalUserId === userId) {
+              dialogModalEl?.classList.add('hidden');
+            }
+            fetchMemory();
+            fetchActivities();
+          } else {
+            showToast(d.error || 'Xatolik', 'error');
+          }
+        } catch (err) {
+          showToast('Xatolik: ' + err.message, 'error');
+        }
+      }
+
+      async function clearAllUserMemories() {
+        if (!confirm('Haqiqatan ham barcha foydalanuvchilarning suhbat xotirasini butunlay tozalamoqchimisiz?')) {
+          return;
+        }
+        try {
+          const res = await apiFetch('/api/memory/clear', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ all: true }),
+          });
+          const d = await res.json();
+          if (d.success) {
+            showToast(d.message || 'Barcha xotiralar tozalandi', 'success');
+            dialogModalEl?.classList.add('hidden');
+            fetchMemory();
+            fetchActivities();
+          } else {
+            showToast(d.error || 'Xatolik', 'error');
+          }
+        } catch (err) {
+          showToast('Xatolik: ' + err.message, 'error');
+        }
+      }
+
+      // Dialog Modal yopish hodisalari
+      btnCloseModalEl?.addEventListener('click', () => dialogModalEl?.classList.add('hidden'));
+      dialogModalEl?.addEventListener('click', (e) => {
+        if (e.target === dialogModalEl) dialogModalEl.classList.add('hidden');
+      });
+      btnModalClearUserEl?.addEventListener('click', () => {
+        if (currentModalUserId) clearSpecificUserMemory(currentModalUserId);
+      });
+
+      // Xotira paneli tugmalari
+      btnRefreshMemoryEl?.addEventListener('click', () => {
+        fetchMemory();
+        showToast('Xotira yangilandi', 'info');
+      });
+      btnClearAllMemoryEl?.addEventListener('click', clearAllUserMemories);
+      memorySearchInputEl?.addEventListener('input', renderMemoryUsers);
 
       // Tezkor namunalar
       document.querySelectorAll('.quick-prompt-btn').forEach(btn => {
@@ -1299,6 +1774,7 @@
         fetchStatus();
         fetchActivities();
         fetchErrors();
+        fetchMemory();
       });
 
       renderKeepAliveToggleEl?.addEventListener('change', () => {
@@ -1337,6 +1813,7 @@
               fetchStatus();
               fetchActivities();
               fetchErrors();
+              fetchMemory();
               pingRenderServer();
               return;
             }

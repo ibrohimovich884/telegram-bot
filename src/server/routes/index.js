@@ -8,6 +8,7 @@ import { handleErrorsRoutes } from "./errors.routes.js";
 import { handleGeminiTestRoute } from "./gemini.routes.js";
 import { handleRenderPingRoute } from "./render.routes.js";
 import { handleTelegramRoutes } from "./telegram.routes.js";
+import { handleMemoryRoutes } from "./memory.routes.js";
 
 /**
  * Barcha API so'rovlarini yo'naltiruvchi bosh router
@@ -46,22 +47,27 @@ export async function dispatchApiRoutes(req, res, pathname) {
       if (handleActivitiesRoute(req, res)) return true;
     }
 
-    // 5. /errors yoki /api/errors*
+    // 5. /api/memory (Foydalanuvchilar xotirasi boshqaruvi)
+    if (pathname === "/api/memory" || pathname.startsWith("/api/memory/")) {
+      if (await handleMemoryRoutes(req, res, pathname)) return true;
+    }
+
+    // 6. /errors yoki /api/errors*
     if (pathname === "/errors" || pathname.startsWith("/api/errors")) {
       if (await handleErrorsRoutes(req, res, pathname)) return true;
     }
 
-    // 6. /api/test-gemini
+    // 7. /api/test-gemini
     if (pathname === "/api/test-gemini") {
       if (await handleGeminiTestRoute(req, res)) return true;
     }
 
-    // 7. /api/ping-render
+    // 8. /api/ping-render
     if (pathname === "/api/ping-render") {
       if (await handleRenderPingRoute(req, res)) return true;
     }
 
-    // 8. /api/polling/* yoki /api/telegram/*
+    // 9. /api/polling/* yoki /api/telegram/*
     if (pathname.startsWith("/api/polling") || pathname.startsWith("/api/telegram")) {
       if (await handleTelegramRoutes(req, res, pathname)) return true;
     }

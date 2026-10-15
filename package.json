@@ -4,9 +4,9 @@
   "type": "module",
   "main": "bot.js",
   "scripts": {
-    "build": "node --check bot.js server.js src/index.js src/config/index.js src/bot/index.js src/server/index.js src/server/auth.js src/server/routes/auth.routes.js src/services/gemini.service.js",
+    "build": "node --check bot.js server.js memory.js src/index.js src/config/index.js src/bot/index.js src/server/index.js src/server/auth.js src/server/routes/auth.routes.js src/services/gemini.service.js src/services/memory.service.js src/server/routes/memory.routes.js src/bot/handlers/directMessage.js",
     "dev": "node bot.js",
-    "lint": "node --check bot.js server.js src/index.js src/config/index.js src/bot/index.js src/server/index.js src/server/auth.js src/server/routes/auth.routes.js src/services/gemini.service.js",
+    "lint": "node --check bot.js server.js memory.js src/index.js src/config/index.js src/bot/index.js src/server/index.js src/server/auth.js src/server/routes/auth.routes.js src/services/gemini.service.js src/services/memory.service.js src/server/routes/memory.routes.js src/bot/handlers/directMessage.js",
     "start": "node bot.js"
 
   },
