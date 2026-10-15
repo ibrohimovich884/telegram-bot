@@ -156,7 +156,6 @@ export function addUserTurn(rawUserId, text, details = {}) {
   memory.messagesCount++;
   memory.updatedAt = turn.timestamp;
 
-  // Chegaradan oshsa, eng eski juftliklarni qisqartiramiz
   if (memory.turns.length > MAX_TURNS_PER_USER) {
     memory.turns.splice(0, memory.turns.length - MAX_TURNS_PER_USER);
   }
@@ -199,13 +198,6 @@ export function addModelTurn(rawUserId, text, meta = {}) {
 
 /**
  * Gemini API talab qiladigan to'g'ri multi-turn formatdagi suhbat tarixini oladi
- * Format: [{ role: 'user', parts: [{ text: '...' }] }, { role: 'model', parts: [{ text: '...' }] }]
- * 
- * Muhim qoidalar:
- * 1. user va model rollari ketma-ket almashinib kelishi shart.
- * 2. Tarixning oxirgi xabari 'model' bo'lishi kerak, shunda navbatdagi kelayotgan mijoz xabari
- *    'user' roli bilan tarix oxiriga tabiiy ravishda ulanadi.
- * 
  * @param {string|number} rawUserId
  * @returns {Array<{ role: 'user'|'model', parts: Array<{ text: string }> }>}
  */
@@ -232,12 +224,10 @@ export function getFormattedHistory(rawUserId) {
       });
       expectedRole = expectedRole === "user" ? "model" : "user";
     } else if (turn.role === "user" && formatted.length > 0 && formatted[formatted.length - 1].role === "user") {
-      // Ketma-ket ikkita user xabari bo'lsa, ularni bitta qilib birlashtiramiz
       formatted[formatted.length - 1].parts[0].text += "\n" + cleanText;
     }
   }
 
-  // Gemini uchun oxirgi xabar 'model' bo'lishi maqbul, shunda yangi kelgan xabar 'user' bo'ladi
   while (formatted.length > 0 && formatted[formatted.length - 1].role !== "model") {
     formatted.pop();
   }
@@ -246,7 +236,7 @@ export function getFormattedHistory(rawUserId) {
 }
 
 /**
- * Aniq bitta foydalanuvchining xotirasini tozalaydi
+ * Aniq bitta foydalanuvchi xotirasini tozalaydi
  * @param {string|number} rawUserId
  * @returns {boolean}
  */
@@ -285,6 +275,23 @@ export function getUserMemory(rawUserId) {
 }
 
 /**
+ * Username bo'yicha foydalanuvchi xotirasini qidiradi
+ * @param {string} rawUsername
+ * @returns {object|null}
+ */
+export function findUserMemoryByUsername(rawUsername) {
+  if (!rawUsername) return null;
+  const target = String(rawUsername).trim().replace(/^@/, "").toLowerCase();
+  for (const m of userMemories.values()) {
+    const u = (m.username || "").trim().replace(/^@/, "").toLowerCase();
+    if (u === target) {
+      return m;
+    }
+  }
+  return null;
+}
+
+/**
  * Dashboard va interfeys uchun barcha foydalanuvchilar ro'yxati va xulosasini qaytaradi
  * @returns {Array<object>}
  */
@@ -307,7 +314,6 @@ export function getAllMemoriesSummary() {
     });
   }
 
-  // So'nggi yangilanish vaqti bo'yicha teskari saralaymiz
   list.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
   return list;
 }
@@ -348,4 +354,5 @@ export default {
   getUserMemory,
   getAllMemoriesSummary,
   getMemoryStats,
+  findUserMemoryByUsername,
 };
