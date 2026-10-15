@@ -1,33 +1,7 @@
-import { ENABLE_POLLING } from "./config.js";
+/**
+ * Bot holati boshqaruvi moduli (orqaga moslik uchun re-export)
+ * Asosiy kod `src/bot/state.js` ichida joylashgan.
+ */
 
-export const botState = {
-  isPollingEnabled: ENABLE_POLLING,
-  pollingStatus: ENABLE_POLLING ? "running" : "paused", // 'running' | 'paused' | 'conflict' | 'stopped' | 'error'
-  lastConflictAt: null,
-  conflictCount: 0,
-  conflictMessage: null,
-  botInfo: null,
-  webhookInfo: null,
-  controller: {
-    pause: async () => {},
-    resume: async () => {},
-    resetWebhook: async () => {},
-    getDiagnostics: async () => null,
-  },
-};
-
-export function setPollingStatus(status, extra = {}) {
-  botState.pollingStatus = status;
-  if (extra.conflict) {
-    botState.lastConflictAt = new Date().toISOString();
-    botState.conflictCount += 1;
-    botState.conflictMessage = extra.message || "Telegram 409: Boshqa bot nusxasi getUpdates bajarmoqda.";
-  }
-}
-
-export function registerBotController(ctrl) {
-  botState.controller = {
-    ...botState.controller,
-    ...ctrl,
-  };
-}
+export * from "./src/bot/state.js";
+export { default } from "./src/bot/state.js";

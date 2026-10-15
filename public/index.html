@@ -2,7 +2,7 @@
 <html lang="uz" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Telegram Business Bot - Monitoring &amp; Boshqaruv</title>
   <meta name="description" content="Telegram business bot powered by Gemini AI with auto-reply and error logging.">
   <meta property="og:title" content="Telegram Business Bot - Monitoring &amp; Boshqaruv">
@@ -19,6 +19,13 @@
     tailwind.config = {
       darkMode: 'class',
       theme: {
+        screens: {
+          'xs': '375px',
+          'sm': '640px',
+          'md': '768px',
+          'lg': '1024px',
+          'xl': '1280px',
+        },
         extend: {
           fontFamily: {
             sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
@@ -53,10 +60,10 @@
     .tabular-nums {
       font-variant-numeric: tabular-nums;
     }
-    /* Custom scrollbar */
+    /* Maxsus ixcham scrollbar */
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
     }
     ::-webkit-scrollbar-track {
       background: #090d16;
@@ -68,601 +75,558 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #334155;
     }
+    /* Gorizontal scroll indikatorsiz */
+    .scrollbar-none::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-none {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
   </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans antialiased text-slate-200 bg-[#090d16] selection:bg-sky-500/20 selection:text-sky-300">
+<body class="min-h-screen flex flex-col font-sans antialiased text-slate-200 bg-[#090d16] selection:bg-sky-500/20 selection:text-sky-300 w-full overflow-x-hidden">
 
-  <!-- TOP BAR CONTRACT (Zone 1: Brand, Zone 2: Single-line Links, Zone 3: 1 Primary CTA) -->
-  <header class="sticky top-0 z-40 w-full border-b border-surface-border bg-surface-canvas/90 backdrop-blur-md">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-8">
+  <!-- TOP BAR (375px mobile optimallashtirilgan) -->
+  <header class="sticky top-0 z-40 w-full border-b border-surface-border bg-surface-canvas/95 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-13 sm:h-16 flex items-center justify-between gap-2">
       
-      <!-- Zone 1: Single text element wordmark -->
-      <a href="/" class="flex items-center gap-3 text-base sm:text-lg font-bold tracking-tight text-white whitespace-nowrap shrink-0 hover:text-sky-400 transition-colors">
-        <svg class="w-6 h-6 text-sky-400 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+      <!-- Logo & Bot nomi (375px da siqilmasligi uchun truncate) -->
+      <a href="/" class="flex items-center gap-2 text-sm sm:text-base font-bold tracking-tight text-white min-w-0 hover:text-sky-400 transition-colors">
+        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-sky-400 shrink-0" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.95-1.28 4.91-2.13 5.89-2.54 2.8-1.17 3.39-1.37 3.77-1.38.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .37z"/>
         </svg>
-        <span>Telegram Bot Boshqaruvi</span>
+        <span class="truncate text-xs sm:text-sm font-bold">TG Bot Monitoring</span>
       </a>
 
-      <!-- Zone 2: 4-5 clean single-line nav links -->
-      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
-        <a href="#overview" class="hover:text-white transition-colors whitespace-nowrap shrink-0">Monitoring</a>
-        <a href="#render-section" class="hover:text-white transition-colors whitespace-nowrap shrink-0">Render Tekshiruvi</a>
-        <a href="#simulator" class="hover:text-white transition-colors whitespace-nowrap shrink-0">Gemini Sinov</a>
-        <a href="#activity-section" class="hover:text-white transition-colors whitespace-nowrap shrink-0">Faoliyat Jurnali</a>
-        <a href="#errors-section" class="hover:text-white transition-colors whitespace-nowrap shrink-0">Xatoliklar</a>
-        <a href="#setup-guide" class="hover:text-white transition-colors whitespace-nowrap shrink-0">Qo'llanma</a>
+      <!-- Desktop Navigatsiya -->
+      <nav class="hidden md:flex items-center gap-5 text-xs font-medium text-slate-300">
+        <a href="#overview" class="hover:text-white transition-colors">Monitoring</a>
+        <a href="#render-section" class="hover:text-white transition-colors">Render Tekshiruvi</a>
+        <a href="#simulator" class="hover:text-white transition-colors">Gemini Sinov</a>
+        <a href="#activity-section" class="hover:text-white transition-colors">Faoliyat</a>
+        <a href="#errors-section" class="hover:text-white transition-colors">Xatoliklar</a>
+        <a href="#setup-guide" class="hover:text-white transition-colors">Qo'llanma</a>
       </nav>
 
-      <!-- Zone 3: 1 primary action + Auth Status -->
-      <div class="flex items-center gap-3 shrink-0">
-        <button id="btn-auth-manage" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-surface-border text-slate-300 hover:text-white bg-surface-card hover:bg-surface-elevated transition-colors shadow-sm">
-          <span id="auth-status-icon">&#128274;</span>
-          <span id="auth-status-label">Parol Kiritish</span>
-        </button>
-        <button id="btn-quick-ping" type="button" class="inline-flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold text-white bg-sky-600 rounded-lg hover:bg-sky-500 active:bg-sky-700 transition-colors whitespace-nowrap shrink-0 shadow-sm shadow-sky-950">
-          <svg id="ping-spinner" class="w-3.5 h-3.5 text-white hidden animate-spin" fill="none" viewBox="0 0 24 24">
+      <!-- O'ng tomon: Admin holati va Tezkor Ping -->
+      <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
+        <div id="header-auth-badge" class="hidden items-center gap-1.5 px-2 py-1 text-[11px] font-semibold rounded-lg bg-surface-card border border-surface-border text-slate-300">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span>Admin</span>
+          <button id="btn-header-logout" type="button" class="text-rose-400 hover:text-rose-300 ml-1 underline" title="Sessiyadan chiqish">
+            Chiqish
+          </button>
+        </div>
+        <button id="btn-quick-ping" type="button" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-white bg-sky-600 rounded-lg hover:bg-sky-500 active:bg-sky-700 transition-colors shrink-0 shadow-sm shadow-sky-950">
+          <svg id="ping-spinner" class="w-3 h-3 text-white hidden animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          <span id="ping-btn-text">Render'ni tekshirish</span>
+          <span class="hidden sm:inline">Render'ni tekshirish</span>
+          <span class="inline sm:hidden">Ping</span>
         </button>
       </div>
 
     </div>
   </header>
 
-  <!-- MAIN VIEWPORT CONTAINER -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+  <!-- ASOSIY KONTEYNER (375px ekranga to'liq moslashtirilgan) -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-5 sm:space-y-8 overflow-x-hidden">
 
-    <!-- INLINE ADMINISTRATOR PAROLI INTERFEYSI (GLOBAL ALERT YO'Q, ODDIY VA QULAY) -->
-    <section id="admin-auth-card" class="p-4 sm:p-5 rounded-2xl bg-surface-card border border-surface-border transition-all">
-      <!-- 1. Hali kirilmagan yoki parolni o'zgartirish holati -->
-      <div id="auth-unauth-view" class="space-y-3">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div class="flex items-center gap-2.5">
-            <span class="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-400 flex items-center justify-center font-bold text-sm shrink-0 border border-sky-500/20">
-              &#128274;
-            </span>
-            <div>
-              <h2 class="text-sm font-bold text-white tracking-tight flex items-center gap-2">
-                <span>Administrator Kirishi &amp; API Boshqaruvi</span>
-              </h2>
-              <p class="text-xs text-slate-400">Dashboard faoliyatini to'liq ko'rish va botni boshqarish uchun admin parolini kiriting</p>
-            </div>
+    <!-- 1. VEB-SAYT ICHIDAGI LOGIN INTERFEYSI (Tashqi browser alert mutlaqo yo'q, parol maxfiy yashiringan) -->
+    <section id="login-view" class="py-6 sm:py-16 max-w-sm mx-auto w-full">
+      <div class="p-4 sm:p-6 rounded-2xl bg-surface-card border border-surface-border shadow-2xl backdrop-blur-md space-y-4">
+        
+        <div class="text-center space-y-1.5">
+          <div class="inline-flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 mb-1">
+            <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
           </div>
-          <span id="auth-env-badge" class="hidden px-2.5 py-1 rounded-md text-[11px] font-mono bg-amber-950/60 text-amber-300 border border-amber-800/50 self-start sm:self-auto">
-            ADMIN_PASSWORD belgilanmagan
-          </span>
+          <h2 class="text-base sm:text-lg font-bold tracking-tight text-white">Administrator Kirishi</h2>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Monitoring va bot sozlamalarini boshqarish uchun admin parolingizni kiriting.
+          </p>
         </div>
 
-        <form id="auth-inline-form" class="flex flex-col sm:flex-row items-stretch gap-2.5 pt-1">
-          <div class="relative flex-1">
-            <input 
-              type="password" 
-              id="auth-password-input" 
-              placeholder="Admin parolini kiriting (ADMIN_PASSWORD)..." 
-              class="w-full h-10 px-3.5 pr-10 bg-[#090d16] border border-surface-border rounded-lg text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500 font-mono transition-colors"
-            >
-            <button type="button" id="btn-toggle-show-pass" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-200 text-xs px-1 py-0.5 rounded" title="Parolni ko'rsatish/yashirish">
-              &#128065;
-            </button>
+        <form id="site-login-form" class="space-y-3.5" autocomplete="off">
+          <div class="space-y-1.5">
+            <label for="site-password-input" class="block text-xs font-semibold text-slate-300">
+              Admin Paroli
+            </label>
+            <div class="relative flex items-center">
+              <!-- type="password" bilan har doim nuqtalarda yashirin bo'ladi, hech qayerda ochiq ko'rinmaydi -->
+              <input 
+                type="password" 
+                id="site-password-input" 
+                required 
+                autocomplete="current-password"
+                placeholder="••••••••"
+                class="w-full h-11 pl-3.5 pr-11 bg-[#090d16] border border-surface-border rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 font-mono tracking-wider transition-all"
+              />
+              <button 
+                type="button" 
+                id="btn-eye-toggle" 
+                class="absolute right-2.5 p-1.5 text-slate-400 hover:text-slate-200 transition-colors focus:outline-none"
+                title="Parolni ko'rsatish yoki yashirish"
+                aria-label="Parol ko'rinishini almashtirish"
+              >
+                <!-- Eye icon (SVG) -->
+                <svg id="eye-icon-show" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <svg id="eye-icon-hide" class="w-4 h-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                </svg>
+              </button>
+            </div>
           </div>
+
+          <!-- Sayt ichidagi xatolik xabarnomasi (Alertsiz) -->
+          <div id="login-error-box" class="hidden p-2.5 rounded-xl border border-rose-900/60 bg-rose-950/40 text-rose-300 text-xs font-mono break-words leading-relaxed">
+          </div>
+
           <button 
             type="submit" 
-            id="btn-save-auth" 
-            class="h-10 px-6 text-xs font-semibold text-white bg-sky-600 hover:bg-sky-500 active:bg-sky-700 rounded-lg transition-colors whitespace-nowrap shrink-0 flex items-center justify-center gap-2 shadow-sm shadow-sky-950"
+            id="btn-login-submit" 
+            class="w-full h-11 px-4 rounded-xl font-semibold text-xs text-white bg-sky-600 hover:bg-sky-500 active:bg-sky-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-sky-950"
           >
-            <span>Kirish / Saqlash</span>
+            <svg id="login-spinner" class="w-4 h-4 text-white hidden animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span id="login-btn-text">Boshqaruvga Kirish</span>
           </button>
         </form>
 
-        <div id="auth-status-inline-msg" class="hidden text-xs font-mono p-2.5 rounded-lg border"></div>
-      </div>
-
-      <!-- 2. Muvaffaqiyatli kirilgan ixcham holat -->
-      <div id="auth-success-view" class="hidden flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-        <div class="flex items-center gap-2.5 text-emerald-400">
-          <span class="w-6 h-6 rounded-full bg-emerald-950/80 border border-emerald-800/40 flex items-center justify-center text-xs font-bold shrink-0">
-            &#10003;
-          </span>
-          <span class="font-semibold text-white">Administrator tizimga ulangan (Sessiya faol)</span>
-          <span class="text-slate-600 hidden sm:inline" aria-hidden="true">&middot;</span>
-          <span class="text-slate-400 hidden sm:inline">Barcha API'lar va boshqaruv ochiq</span>
-        </div>
-        <div class="flex items-center gap-2 self-start sm:self-auto">
-          <button type="button" id="btn-reenter-pass" class="px-3 py-1.5 rounded-lg bg-[#090d16] hover:bg-surface-elevated text-slate-300 hover:text-white border border-surface-border transition-colors font-medium">
-            Parolni o'zgartirish
-          </button>
-          <button type="button" id="btn-forget-auth" class="px-3 py-1.5 rounded-lg bg-[#090d16] hover:bg-rose-950/40 text-rose-400 border border-surface-border hover:border-rose-900/60 transition-colors font-medium">
-            Chiqish (Reset)
-          </button>
-        </div>
       </div>
     </section>
 
-    <!-- HERO OVERVIEW BAR -->
-    <section id="overview" class="space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-surface-border">
-        <div>
-          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">Bot Ish Faoliyati va Monitoring</h1>
-          <div class="mt-1 flex items-center gap-2 text-xs sm:text-sm text-slate-400">
-            <span>Telegram Business Bot</span>
-            <span aria-hidden="true">·</span>
-            <span>Gemini AI Integratsiyasi</span>
-            <span aria-hidden="true">·</span>
-            <span class="font-mono tabular-nums" id="system-time">Yuklanmoqda...</span>
-          </div>
-        </div>
-        
-        <div class="flex items-center gap-3">
-          <div class="text-xs text-right hidden sm:block">
-            <span class="text-slate-400 block">Avto-yangilanish:</span>
-            <span class="text-slate-200 font-mono text-xs" id="auto-refresh-label">Har 3 soniyada</span>
-          </div>
-          <button id="btn-refresh-all" type="button" class="px-3 py-1.5 text-xs font-medium text-slate-300 bg-surface-card border border-surface-border rounded-lg hover:text-white hover:border-surface-borderLight transition-colors whitespace-nowrap shrink-0">
-            Yangilash
-          </button>
-        </div>
-      </div>
+    <!-- 2. ASOSIY DASHBOARD KONTEYNERI (Faqat to'g'ri parol kiritilganda ochiladi) -->
+    <div id="dashboard-content" class="hidden space-y-5 sm:space-y-8">
 
-      <!-- KPI METRIC STRIP (Single elevation, hairline borders, tabular numerals) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        
-        <!-- KPI 1: Bot Status & Uptime -->
-        <div class="p-5 rounded-xl bg-surface-card border border-surface-border flex flex-col justify-between">
-          <div class="flex items-start justify-between">
-            <span class="text-xs font-medium text-slate-400">Bot Holati</span>
-            <span id="badge-bot-status" class="text-xs font-mono font-medium text-emerald-400">
-              Faol
-            </span>
-          </div>
-          <div class="mt-4">
-            <div id="metric-uptime" class="text-2xl font-bold font-mono tabular-nums text-white">0d 0h 0m</div>
-            <div class="mt-1 text-xs text-slate-400 flex items-center gap-1.5">
-              <span>Uptime</span>
+      <!-- BO'LIM 1: HERO OVERVIEW & STATS -->
+      <section id="overview" class="space-y-3.5 sm:space-y-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 sm:pb-4 border-b border-surface-border">
+          <div class="min-w-0">
+            <h1 class="text-base sm:text-2xl font-bold tracking-tight text-white truncate">Bot Ish Faoliyati va Monitoring</h1>
+            <div class="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-slate-400">
+              <span class="text-sky-400 font-medium">Telegram Business</span>
               <span aria-hidden="true">·</span>
-              <span id="metric-start-time" class="font-mono tabular-nums text-slate-300">--:--:--</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- KPI 2: Telegram Updates -->
-        <div class="p-5 rounded-xl bg-surface-card border border-surface-border flex flex-col justify-between">
-          <div class="flex items-start justify-between">
-            <span class="text-xs font-medium text-slate-400">Telegram Hodisalari</span>
-            <span class="text-xs text-slate-400" id="badge-connection-count">0 ulanish</span>
-          </div>
-          <div class="mt-4">
-            <div id="metric-updates" class="text-2xl font-bold font-mono tabular-nums text-white">0</div>
-            <div class="mt-1 text-xs text-slate-400 flex items-center gap-1.5">
-              <span>Biznes xabarlar:</span>
-              <span id="metric-business-messages" class="font-mono tabular-nums text-slate-300">0</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- KPI 3: Gemini AI Replies -->
-        <div class="p-5 rounded-xl bg-surface-card border border-surface-border flex flex-col justify-between">
-          <div class="flex items-start justify-between">
-            <span class="text-xs font-medium text-slate-400">Gemini AI Javoblari</span>
-            <span class="text-xs font-mono text-sky-400">gemini-3.8-flash</span>
-          </div>
-          <div class="mt-4">
-            <div id="metric-replies" class="text-2xl font-bold font-mono tabular-nums text-white">0</div>
-            <div class="mt-1 text-xs text-slate-400 flex items-center gap-1.5">
-              <span>Avto-javob</span>
+              <span>Gemini AI</span>
               <span aria-hidden="true">·</span>
-              <span class="text-emerald-400">Faol</span>
+              <span class="font-mono tabular-nums text-[11px] sm:text-xs" id="system-time">Yuklanmoqda...</span>
             </div>
+          </div>
+          
+          <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto shrink-0">
+            <div class="text-[11px] text-slate-400">
+              <span>Avto:</span>
+              <span class="text-slate-200 font-mono ml-1" id="auto-refresh-label">3s</span>
+            </div>
+            <button id="btn-refresh-all" type="button" class="px-2.5 py-1 text-xs font-medium text-slate-300 bg-surface-card border border-surface-border rounded-lg hover:text-white transition-colors shrink-0">
+              Yangilash
+            </button>
           </div>
         </div>
 
-        <!-- KPI 4: Render Deployment Status -->
-        <div class="p-5 rounded-xl bg-surface-card border border-surface-border flex flex-col justify-between">
-          <div class="flex items-start justify-between">
-            <span class="text-xs font-medium text-slate-400">Render Server</span>
-            <span id="badge-render-status" class="text-xs font-mono font-medium text-slate-400">Tekshirilmagan</span>
-          </div>
-          <div class="mt-4">
-            <div id="metric-render-latency" class="text-2xl font-bold font-mono tabular-nums text-white">-- ms</div>
-            <div class="mt-1 text-xs text-slate-400 flex items-center gap-1.5 truncate">
-              <span id="metric-render-subtext">telegram-bot-imap</span>
+        <!-- KPI METRIC KARTALARI (375px ekranda bitta ustunda qulay sig'adi) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+          
+          <!-- KPI 1: Bot Status -->
+          <div class="p-3.5 sm:p-4 rounded-xl bg-surface-card border border-surface-border flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-2">
+              <span class="text-xs font-medium text-slate-400">Bot Holati</span>
+              <span id="badge-bot-status" class="text-xs font-mono font-medium text-emerald-400 truncate max-w-[150px]">
+                Faol
+              </span>
+            </div>
+            <div class="mt-2.5 sm:mt-3">
+              <div id="metric-uptime" class="text-lg sm:text-2xl font-bold font-mono tabular-nums text-white">0d 0h 0m</div>
+              <div class="mt-0.5 text-[11px] text-slate-400 flex items-center gap-1.5">
+                <span>Uptime</span>
+                <span aria-hidden="true">·</span>
+                <span id="metric-start-time" class="font-mono tabular-nums text-slate-300">--:--:--</span>
+              </div>
             </div>
           </div>
+
+          <!-- KPI 2: Telegram Updates -->
+          <div class="p-3.5 sm:p-4 rounded-xl bg-surface-card border border-surface-border flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-2">
+              <span class="text-xs font-medium text-slate-400">Telegram Hodisalari</span>
+              <span class="text-xs text-slate-400 font-mono" id="badge-connection-count">0 ulanish</span>
+            </div>
+            <div class="mt-2.5 sm:mt-3">
+              <div id="metric-updates" class="text-lg sm:text-2xl font-bold font-mono tabular-nums text-white">0</div>
+              <div class="mt-0.5 text-[11px] text-slate-400 flex items-center gap-1.5">
+                <span>Biznes xabarlar:</span>
+                <span id="metric-business-messages" class="font-mono tabular-nums text-slate-300">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 3: Gemini AI Javoblari -->
+          <div class="p-3.5 sm:p-4 rounded-xl bg-surface-card border border-surface-border flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-2">
+              <span class="text-xs font-medium text-slate-400">Gemini AI Javoblari</span>
+              <span class="text-xs font-mono text-sky-400">gemini-3.8-flash</span>
+            </div>
+            <div class="mt-2.5 sm:mt-3">
+              <div id="metric-replies" class="text-lg sm:text-2xl font-bold font-mono tabular-nums text-white">0</div>
+              <div class="mt-0.5 text-[11px] text-slate-400 flex items-center gap-1.5">
+                <span>Avto-javob:</span>
+                <span class="text-emerald-400 font-medium">Faol</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- KPI 4: Render Deployment -->
+          <div class="p-3.5 sm:p-4 rounded-xl bg-surface-card border border-surface-border flex flex-col justify-between">
+            <div class="flex items-start justify-between gap-2">
+              <span class="text-xs font-medium text-slate-400">Render Server</span>
+              <span id="badge-render-status" class="text-xs font-mono font-medium text-slate-400 truncate">Kutilmoqda</span>
+            </div>
+            <div class="mt-2.5 sm:mt-3">
+              <div id="metric-render-latency" class="text-lg sm:text-2xl font-bold font-mono tabular-nums text-white">-- ms</div>
+              <div class="mt-0.5 text-[11px] text-slate-400 truncate" id="metric-render-subtext">
+                telegram-bot-imap
+              </div>
+            </div>
+          </div>
+
         </div>
 
-      </div>
-
-      <!-- SYSTEM ENVIRONMENT & CONFIG DETAIL STRIP -->
-      <div class="p-4 rounded-xl bg-surface-card/60 border border-surface-border text-xs text-slate-400 flex flex-wrap items-center justify-between gap-y-3 gap-x-6">
-        <div class="flex items-center gap-4 flex-wrap">
-          <div class="flex items-center gap-1.5">
-            <span class="text-slate-500">Telegram Bot:</span>
-            <span id="sys-bot-user" class="text-slate-200 font-mono">Yuklanmoqda...</span>
+        <!-- TIZIM PARAMETRLARI LENTASI (375px ekranda ixcham 2 ustunli grid) -->
+        <div class="p-3 sm:p-3.5 rounded-xl bg-surface-card/60 border border-surface-border text-[11px] text-slate-400 grid grid-cols-2 sm:flex sm:items-center sm:justify-between gap-2">
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span class="text-slate-500">Bot:</span>
+            <span id="sys-bot-user" class="text-slate-200 font-mono truncate">Yuklanmoqda...</span>
           </div>
-          <span class="text-slate-700" aria-hidden="true">|</span>
           <div class="flex items-center gap-1.5">
-            <span class="text-slate-500">Bot Token:</span>
+            <span class="text-slate-500">Token:</span>
             <span id="sys-bot-token" class="text-slate-200 font-mono">Tekshirilmoqda</span>
           </div>
-          <span class="text-slate-700" aria-hidden="true">|</span>
           <div class="flex items-center gap-1.5">
-            <span class="text-slate-500">Gemini Kalit:</span>
+            <span class="text-slate-500">Gemini:</span>
             <span id="sys-gemini-key" class="text-slate-200 font-mono">Tekshirilmoqda</span>
           </div>
-          <span class="text-slate-700" aria-hidden="true">|</span>
           <div class="flex items-center gap-1.5">
             <span class="text-slate-500">Xotira:</span>
             <span id="sys-memory" class="text-slate-200 font-mono tabular-nums">0 MB</span>
           </div>
+          <div class="flex items-center gap-1.5 col-span-2 sm:col-span-1 border-t sm:border-0 border-surface-border/40 pt-1 sm:pt-0">
+            <span class="text-slate-500">Port:</span>
+            <span id="sys-port-num" class="text-slate-300 font-mono">3000</span>
+            <span class="text-slate-700 mx-1" aria-hidden="true">|</span>
+            <span class="text-slate-500">Node:</span>
+            <span id="sys-node-ver" class="text-slate-300 font-mono">--</span>
+          </div>
         </div>
-        <div class="flex items-center gap-3">
-          <span class="text-slate-500">Port:</span>
-          <span id="sys-port-num" class="text-slate-300 font-mono">3000</span>
-          <span class="text-slate-700" aria-hidden="true">|</span>
-          <span class="text-slate-500">Node:</span>
-          <span id="sys-node-ver" class="text-slate-300 font-mono">--</span>
-        </div>
-      </div>
 
-      <!-- 409 CONFLICT DIAGNOSTICS & CONTROL CARD -->
-      <div id="conflict-alert-card" class="hidden p-5 rounded-2xl bg-amber-950/30 border border-amber-600/40 text-amber-200 space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-          <div class="flex items-start gap-3">
-            <div class="p-2 rounded-lg bg-amber-500/20 text-amber-400 shrink-0 mt-0.5">
-              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-              </svg>
-            </div>
-            <div class="space-y-1">
-              <div class="flex items-center gap-2 flex-wrap">
-                <h3 class="text-sm font-bold text-amber-300">Telegram 409: To'qnashuv Aniqlandi (Bot 2 ta joyda ishga tushgan)</h3>
-                <span id="conflict-badge-count" class="px-2 py-0.5 text-[11px] font-mono rounded bg-amber-500/20 border border-amber-500/40 text-amber-300">1 marta</span>
+        <!-- 409 TO'QNASHUV AGAR YUZAGA KELSA KO'RINADIGAN BLOK -->
+        <div id="conflict-alert-card" class="hidden p-3.5 sm:p-4 rounded-xl bg-amber-950/30 border border-amber-600/40 text-amber-200 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2.5">
+            <div class="flex items-start gap-2">
+              <div class="p-1.5 rounded bg-amber-500/20 text-amber-400 shrink-0 mt-0.5">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
               </div>
-              <p class="text-xs text-amber-200/90 leading-relaxed">
-                Telegram bitta Bot Token bilan bir vaqtda faqat <strong>1 ta faol</strong> so'rovga (<code class="bg-black/40 px-1 py-0.5 rounded text-amber-300">getUpdates</code>) ruxsat beradi. 
-                Sizning botingiz hozir <strong>Render serverida</strong> (<span class="font-mono text-white">telegram-bot-imap.onrender.com</span>) va ushbu <strong>AI Studio</strong> muhitida bir paytda ishga tushirilgan.
+              <div>
+                <h3 class="text-xs sm:text-sm font-bold text-amber-300">Telegram 409 To'qnashuvi</h3>
+                <p class="text-xs text-amber-200/90 leading-relaxed mt-0.5">
+                  Telegram bitta token bilan bir paytda bitta serverga ruxsat beradi. Render va AI Studio to'qnashmasligi uchun Standby rejimiga o'tkazishingiz mumkin.
+                </p>
+              </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-1.5 w-full sm:w-auto shrink-0">
+              <button id="btn-pause-polling" type="button" class="w-full sm:w-auto px-3 py-1.5 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-500 rounded-lg transition-colors text-center">
+                Standby Rejimi
+              </button>
+              <button id="btn-reset-telegram" type="button" class="w-full sm:w-auto px-3 py-1.5 text-xs font-medium text-amber-200 bg-black/40 border border-amber-600/50 rounded-lg text-center">
+                Tozalash
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- POLLING HOLATI VA BOSHQARUV TUGMALARI (375px ekranga mos) -->
+        <div class="p-3.5 sm:p-4 rounded-xl bg-surface-card border border-surface-border flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <div id="polling-status-indicator" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-bold text-white uppercase tracking-wider">Lokal Polling:</span>
+                <span id="polling-status-badge" class="px-2 py-0.5 text-[11px] font-mono font-medium text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 rounded">
+                  Faol
+                </span>
+              </div>
+              <p id="polling-status-description" class="text-xs text-slate-400 mt-0.5 truncate">
+                Telegram so'rovlarini qabul qilmoqda.
               </p>
             </div>
           </div>
-          <div class="flex items-center gap-2 sm:self-center shrink-0 flex-wrap">
-            <button id="btn-pause-polling" type="button" class="px-3.5 py-1.5 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-500 rounded-lg transition-colors whitespace-nowrap shadow-sm">
-              AI Studio'da Pollingni To'xtatish (Render ishlashi uchun)
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full md:w-auto">
+            <button id="btn-toggle-polling" type="button" class="w-full py-2 px-3 text-xs font-semibold text-slate-200 bg-surface-elevated hover:bg-slate-700 border border-surface-border rounded-lg transition-colors text-center">
+              Standby Rejimi
             </button>
-            <button id="btn-reset-telegram" type="button" class="px-3 py-1.5 text-xs font-medium text-amber-200 bg-black/40 hover:bg-black/60 border border-amber-600/50 rounded-lg transition-colors whitespace-nowrap">
-              Sessiyani Tozalash (deleteWebhook)
+            <button id="btn-force-reset-session" type="button" class="w-full py-2 px-3 text-xs font-medium text-slate-300 bg-surface-elevated hover:bg-slate-700 border border-surface-border rounded-lg transition-colors text-center">
+              Qulflarni Bo'shatish
+            </button>
+            <button id="btn-check-tg-info" type="button" class="w-full py-2 px-3 text-xs font-medium text-sky-400 bg-sky-950/40 hover:bg-sky-900/40 border border-sky-800/40 rounded-lg transition-colors text-center">
+              Diagnostika
             </button>
           </div>
         </div>
+      </section>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-3 border-t border-amber-600/20 text-xs">
-          <div class="bg-black/30 p-2.5 rounded-lg border border-amber-700/20">
-            <span class="text-amber-400 font-semibold block mb-0.5">1. Render'ni asosiy qilish:</span>
-            <span class="text-amber-200/80">Yuqoridagi "Pollingni To'xtatish" tugmasini bosing. Render botingiz to'liq va uzluksiz javob bera boshlaydi.</span>
-          </div>
-          <div class="bg-black/30 p-2.5 rounded-lg border border-amber-700/20">
-            <span class="text-amber-400 font-semibold block mb-0.5">2. Render Port sozlamasi:</span>
-            <span class="text-amber-200/80">Koddagi PORT <code class="text-amber-300">process.env.PORT || 3000</code> ga to'g'irlangan, Render healthcheck endi qulab tushmaydi.</span>
-          </div>
-          <div class="bg-black/30 p-2.5 rounded-lg border border-amber-700/20">
-            <span class="text-amber-400 font-semibold block mb-0.5">3. Render Deploy Jarayoni:</span>
-            <span class="text-amber-200/80">Render yangi versiya chiqarganda 1-2 daqiqa davomida eski va yangi instansiya to'qnashishi mumkin, so'ng o'z-o'zidan barqarorlashadi.</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- TELEGRAM STATUS & POLLING MANAGER STRIP -->
-      <div class="p-4 rounded-xl bg-surface-card border border-surface-border flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <div id="polling-status-indicator" class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shrink-0"></div>
+      <!-- BO'LIM 2: RENDER PRODUCTION PROBER (375px ekranga mos) -->
+      <section id="render-section" class="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-surface-card border border-surface-border space-y-3.5 sm:space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-bold text-white uppercase tracking-wider">Lokal Polling Holati:</span>
-              <span id="polling-status-badge" class="px-2 py-0.5 text-xs font-mono font-medium text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 rounded">
-                Faol (Running)
-              </span>
-            </div>
-            <p id="polling-status-description" class="text-xs text-slate-400 mt-0.5">
-              Ushbu muhit Telegram'dan hodisalarni qabul qilmoqda.
+            <h2 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+              Render Serverini Tekshirish (Prober)
+            </h2>
+            <p class="mt-0.5 text-xs text-slate-400">
+              Masofadagi Render bulut serveri holatini tekshirish va uxlab qolishining oldini olish.
             </p>
           </div>
-        </div>
-        <div class="flex items-center gap-2 flex-wrap">
-          <button id="btn-toggle-polling" type="button" class="px-3.5 py-1.5 text-xs font-semibold text-slate-200 bg-surface-elevated hover:bg-slate-700 border border-surface-border rounded-lg transition-colors whitespace-nowrap">
-            Standby Rejimiga O'tkazish
-          </button>
-          <button id="btn-force-reset-session" type="button" class="px-3 py-1.5 text-xs font-medium text-slate-300 bg-surface-elevated hover:bg-slate-700 border border-surface-border rounded-lg transition-colors whitespace-nowrap">
-            Webhook &amp; Qulflarni Bo'shatish
-          </button>
-          <button id="btn-check-tg-info" type="button" class="px-3 py-1.5 text-xs font-medium text-sky-400 bg-sky-950/40 hover:bg-sky-900/40 border border-sky-800/40 rounded-lg transition-colors whitespace-nowrap">
-            Telegram Diagnostika
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 2: RENDER PRODUCTION PROBER (User specifically provided https://telegram-bot-imap.onrender.com/) -->
-    <section id="render-section" class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-6">
-
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-lg font-bold text-white flex items-center gap-2">
-            <span>Render Serverini Jonli Tekshirish (Prober)</span>
-          </h2>
-          <p class="mt-1 text-xs text-slate-400">
-            Masofadagi Render bulut serverining ishlayotganligini tekshirish, javob vaqtini o'lchash va uxlab qolishining (spindown) oldini olish.
-          </p>
-        </div>
-        <div class="flex items-center gap-3">
           <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none">
-            <input type="checkbox" id="render-keepalive-toggle" class="w-4 h-4 rounded border-slate-700 bg-slate-900 text-sky-600 focus:ring-sky-500 focus:ring-offset-0">
-            <span>Keep-Alive (Har 5 daqiqada uyg'otish)</span>
+            <input type="checkbox" id="render-keepalive-toggle" class="w-4 h-4 rounded border-slate-700 bg-slate-900 text-sky-600 focus:ring-sky-500">
+            <span>Keep-Alive (Har 5 daqiqa)</span>
           </label>
         </div>
-      </div>
 
-      <!-- Prober control row -->
-      <div class="flex flex-col sm:flex-row items-stretch gap-3">
-        <div class="flex-1 relative">
+        <div class="flex flex-col sm:flex-row items-stretch gap-2">
           <input 
             type="url" 
             id="render-url-input" 
             value="https://telegram-bot-imap.onrender.com" 
             readonly
             title="SSRF xavfsizligi: Faqat o'z Render serveringiz tekshiriladi"
-            class="w-full h-10 px-3.5 bg-[#090d16] border border-surface-border rounded-lg text-sm font-mono text-slate-300 cursor-default focus:outline-none select-all"
-          >
-        </div>
-        <button 
-          id="btn-ping-render" 
-          type="button" 
-          class="h-10 px-5 text-xs font-semibold text-white bg-sky-600 hover:bg-sky-500 active:bg-sky-700 rounded-lg transition-colors whitespace-nowrap shrink-0 flex items-center justify-center gap-2"
-        >
-          <svg id="prober-spinner" class="w-4 h-4 text-white hidden animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span id="prober-btn-text">Holatni Tekshirish (Ping)</span>
-        </button>
-      </div>
-
-      <!-- Prober Results Display -->
-      <div id="render-result-box" class="p-4 rounded-xl bg-[#090d16] border border-surface-border text-sm">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pb-4 border-b border-surface-border/60">
-          <div>
-            <span class="text-xs text-slate-500 block">Javob Kodi:</span>
-            <span id="res-status-code" class="text-base font-bold font-mono tabular-nums text-slate-300">--</span>
-          </div>
-          <div>
-            <span class="text-xs text-slate-500 block">Javob Tezligi (Latency):</span>
-            <span id="res-latency" class="text-base font-bold font-mono tabular-nums text-slate-300">-- ms</span>
-          </div>
-          <div>
-            <span class="text-xs text-slate-500 block">Render Xatolar Soni:</span>
-            <span id="res-render-errors" class="text-base font-bold font-mono tabular-nums text-slate-300">--</span>
-          </div>
-          <div>
-            <span class="text-xs text-slate-500 block">Oxirgi Tekshiruv:</span>
-            <span id="res-checked-time" class="text-xs font-mono text-slate-400">Hali tekshirilmadi</span>
-          </div>
-        </div>
-
-        <div class="mt-4 space-y-1">
-          <div class="text-xs font-medium text-slate-400">Serverdan Qaytgan Xabar:</div>
-          <div id="res-response-text" class="p-2.5 rounded bg-surface-canvas font-mono text-xs text-slate-300 border border-surface-border/40 overflow-x-auto whitespace-pre-wrap">
-            "Tekshirish" tugmasini bosing yoki avto-ping natijasini kuting.
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 3: GEMINI AI INTERACTIVE SIMULATOR (Oybek nomidan sinash) -->
-    <section id="simulator" class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-6">
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-lg font-bold text-white">Gemini AI Javobini Sinash Konsoli</h2>
-          <p class="mt-1 text-xs text-slate-400">
-            Mijoz sizga Telegram orqali yozganda bot qanday javob berishini shu yerda to'g'ridan-to'g'ri sinab ko'ring.
-          </p>
-        </div>
-        <div class="text-xs text-slate-400">
-          <span>Model:</span>
-          <span class="text-slate-200 font-mono ml-1">gemini-3.8-flash</span>
-        </div>
-      </div>
-
-      <!-- Quick prompts buttons -->
-      <div class="flex items-center gap-2 flex-wrap">
-        <span class="text-xs text-slate-500">Tezkor namunalar:</span>
-        <button type="button" class="quick-prompt-btn px-2.5 py-1 text-xs rounded bg-surface-elevated text-slate-300 hover:text-white hover:bg-slate-700 transition-colors">
-          Salom, do'koningiz ochiqmi?
-        </button>
-        <button type="button" class="quick-prompt-btn px-2.5 py-1 text-xs rounded bg-surface-elevated text-slate-300 hover:text-white hover:bg-slate-700 transition-colors">
-          Assalomu alaykum, Oybek bilan gaplashsam bo'ladimi?
-        </button>
-        <button type="button" class="quick-prompt-btn px-2.5 py-1 text-xs rounded bg-surface-elevated text-slate-300 hover:text-white hover:bg-slate-700 transition-colors">
-          Xizmat narxlari qancha?
-        </button>
-      </div>
-
-      <!-- Prompt Input Form -->
-      <form id="gemini-test-form" class="space-y-3">
-        <div class="flex flex-col sm:flex-row items-stretch gap-3">
-          <input 
-            type="text" 
-            id="gemini-input-text" 
-            placeholder="Mijoz xabarini kiriting (masalan: Salom, bugun qabul bormi?)..." 
-            class="flex-1 h-11 px-4 bg-[#090d16] border border-surface-border rounded-lg text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
-            required
+            class="flex-1 h-10 px-3 bg-[#090d16] border border-surface-border rounded-lg text-xs font-mono text-slate-300 cursor-default select-all truncate"
           >
           <button 
-            type="submit" 
-            id="btn-gemini-submit" 
-            class="h-11 px-6 text-xs font-semibold text-white bg-sky-600 hover:bg-sky-500 active:bg-sky-700 rounded-lg transition-colors whitespace-nowrap shrink-0 flex items-center justify-center gap-2"
+            id="btn-ping-render" 
+            type="button" 
+            class="h-10 px-4 w-full sm:w-auto text-xs font-semibold text-white bg-sky-600 hover:bg-sky-500 active:bg-sky-700 rounded-lg transition-colors shrink-0 flex items-center justify-center gap-2"
           >
-            <svg id="gemini-spinner" class="w-4 h-4 text-white hidden animate-spin" fill="none" viewBox="0 0 24 24">
+            <svg id="prober-spinner" class="w-3.5 h-3.5 text-white hidden animate-spin" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <span id="gemini-btn-text">AI Javobini Olish</span>
+            <span id="prober-btn-text">Holatni Tekshirish (Ping)</span>
           </button>
         </div>
-      </form>
 
-      <!-- Gemini Output Card -->
-      <div id="gemini-response-card" class="p-4 rounded-xl bg-[#090d16] border border-surface-border space-y-2">
-        <div class="flex items-center justify-between text-xs text-slate-400">
-          <span>Gemini AI Javobi:</span>
-          <span id="gemini-latency-label" class="font-mono tabular-nums text-slate-300">Kutilmoqda</span>
-        </div>
-        <div id="gemini-reply-content" class="p-3 rounded bg-surface-canvas font-sans text-sm text-slate-200 leading-relaxed border border-surface-border/40 min-h-[48px] flex items-center">
-          <span class="text-slate-500 italic">Yuqoridagi maydonga xabar kiritib "AI Javobini Olish" tugmasini bosing...</span>
-        </div>
-        <div class="pt-2 text-xs text-slate-500 flex items-center gap-1.5 truncate">
-          <span>Tizim ko'rsatmasi (System Prompt):</span>
-          <span id="sys-prompt-preview" class="text-slate-400 truncate">Sen Oybekning nomidan javob beryapsan...</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 4: REAL-TIME ACTIVITY FEED (Faoliyat Jurnali) -->
-    <section id="activity-section" class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-lg font-bold text-white">Jonli Faoliyat Jurnali (Live Activity Feed)</h2>
-          <p class="mt-1 text-xs text-slate-400">
-            Telegram botga kelayotgan har bir hodisa, mijoz xabari va AI javobi shu yerda aks etadi.
-          </p>
-        </div>
-        
-        <!-- Filter segmented buttons (ALLOWED: functional buttons with click handlers) -->
-        <div class="flex items-center gap-1 p-1 bg-[#090d16] border border-surface-border rounded-lg text-xs font-medium">
-          <button type="button" data-filter="all" class="filter-btn px-3 py-1 rounded text-white bg-surface-elevated transition-colors">
-            Hammasi
-          </button>
-          <button type="button" data-filter="ai_reply" class="filter-btn px-3 py-1 rounded text-slate-400 hover:text-white transition-colors">
-            AI Javoblar
-          </button>
-          <button type="button" data-filter="update" class="filter-btn px-3 py-1 rounded text-slate-400 hover:text-white transition-colors">
-            Telegram
-          </button>
-          <button type="button" data-filter="error" class="filter-btn px-3 py-1 rounded text-slate-400 hover:text-white transition-colors">
-            Xatoliklar
-          </button>
-        </div>
-      </div>
-
-      <!-- Activity Items List Container -->
-      <div class="space-y-2 max-h-[450px] overflow-y-auto pr-1" id="activity-list">
-        <div class="p-8 text-center text-xs text-slate-500">
-          Faoliyatlar yuklanmoqda...
-        </div>
-      </div>
-    </section>
-
-    <!-- SECTION 5: ERROR LOGS (Xatoliklar Jurnali) -->
-    <section id="errors-section" class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-6">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div class="flex items-center gap-3">
-            <h2 class="text-lg font-bold text-white">Tizim Xatoliklari (Errors Log)</h2>
-            <span id="errors-count-badge" class="font-mono text-xs tabular-nums text-slate-400">0 ta xatolik</span>
+        <!-- Render natijalari -->
+        <div id="render-result-box" class="p-3 rounded-xl bg-[#090d16] border border-surface-border text-xs">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pb-2.5 border-b border-surface-border/60">
+            <div>
+              <span class="text-[11px] text-slate-500 block">Javob Kodi:</span>
+              <span id="res-status-code" class="text-xs sm:text-sm font-bold font-mono tabular-nums text-slate-300">--</span>
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-500 block">Tezlik:</span>
+              <span id="res-latency" class="text-xs sm:text-sm font-bold font-mono tabular-nums text-slate-300">-- ms</span>
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-500 block">Xatoliklar:</span>
+              <span id="res-render-errors" class="text-xs sm:text-sm font-bold font-mono tabular-nums text-slate-300">--</span>
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-500 block">Oxirgi Ping:</span>
+              <span id="res-checked-time" class="text-[11px] font-mono text-slate-400">Kutilmoqda</span>
+            </div>
           </div>
-          <p class="mt-1 text-xs text-slate-400">
-            Tokenlar va maxfiy kalitlar avtomatik yashirilgan holda qayd etiladi.
-          </p>
+
+          <div class="mt-2.5 space-y-1">
+            <div class="text-[11px] font-medium text-slate-400">Serverdan Qaytgan Xabar:</div>
+            <div id="res-response-text" class="p-2.5 rounded bg-surface-canvas font-mono text-[11px] text-slate-300 border border-surface-border/40 max-h-28 overflow-y-auto break-all whitespace-pre-wrap">
+              "Holatni Tekshirish" tugmasini bosing yoki avto-ping natijasini kuting.
+            </div>
+          </div>
         </div>
-        <div class="flex items-center gap-2">
-          <button id="btn-copy-errors" type="button" class="px-3 py-1.5 text-xs font-medium text-slate-300 bg-[#090d16] border border-surface-border rounded-lg hover:text-white transition-colors whitespace-nowrap shrink-0">
-            JSON Nusxa olish
+      </section>
+
+      <!-- BO'LIM 3: GEMINI AI SINOV KONSOLI (375px ekranga mos) -->
+      <section id="simulator" class="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-surface-card border border-surface-border space-y-3.5 sm:space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+          <div>
+            <h2 class="text-sm sm:text-base font-bold text-white">Gemini AI Javobini Sinash</h2>
+            <p class="text-xs text-slate-400">
+              Mijoz Telegram orqali yozganda bot beradigan javobni shu yerda tezkor tekshiring.
+            </p>
+          </div>
+          <div class="text-[11px] text-slate-400">
+            <span>Model:</span>
+            <span class="text-slate-200 font-mono ml-1">gemini-3.8-flash</span>
+          </div>
+        </div>
+
+        <!-- Namunalar (375px da toza wrap) -->
+        <div class="flex flex-col sm:flex-row sm:flex-wrap gap-1.5">
+          <span class="text-[11px] text-slate-500 shrink-0 self-center">Namunalar:</span>
+          <button type="button" class="quick-prompt-btn px-2.5 py-1 text-left text-xs rounded bg-surface-elevated text-slate-300 hover:text-white transition-colors truncate max-w-full">
+            Salom, do'koningiz ochiqmi?
           </button>
-          <button id="btn-clear-errors" type="button" class="px-3 py-1.5 text-xs font-medium text-rose-400 bg-[#090d16] border border-surface-border rounded-lg hover:bg-rose-950/40 hover:border-rose-800 transition-colors whitespace-nowrap shrink-0">
-            Jurnalni tozalash
+          <button type="button" class="quick-prompt-btn px-2.5 py-1 text-left text-xs rounded bg-surface-elevated text-slate-300 hover:text-white transition-colors truncate max-w-full">
+            Assalomu alaykum, narxlar qancha?
           </button>
         </div>
-      </div>
 
-      <!-- Error Entries Table / List -->
-      <div id="errors-list" class="space-y-2 max-h-[350px] overflow-y-auto pr-1">
-        <div class="p-6 text-center text-xs text-slate-500 border border-dashed border-surface-border rounded-xl">
-          Hozircha hech qanday xatolik qayd etilmagan. Bot barqaror ishlamoqda!
+        <form id="gemini-test-form" class="space-y-2.5">
+          <div class="flex flex-col sm:flex-row gap-2">
+            <input 
+              type="text" 
+              id="gemini-input-text" 
+              placeholder="Mijoz xabarini kiriting..." 
+              class="flex-1 h-10 px-3.5 bg-[#090d16] border border-surface-border rounded-lg text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+              required
+            >
+            <button 
+              type="submit" 
+              id="btn-gemini-submit" 
+              class="h-10 px-4 w-full sm:w-auto text-xs font-semibold text-white bg-sky-600 hover:bg-sky-500 active:bg-sky-700 rounded-lg transition-colors shrink-0 flex items-center justify-center gap-2"
+            >
+              <svg id="gemini-spinner" class="w-3.5 h-3.5 text-white hidden animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span id="gemini-btn-text">AI Javobini Olish</span>
+            </button>
+          </div>
+        </form>
+
+        <div id="gemini-response-card" class="p-3 rounded-xl bg-[#090d16] border border-surface-border space-y-1.5">
+          <div class="flex items-center justify-between text-[11px] text-slate-400">
+            <span>Gemini AI Javobi:</span>
+            <span id="gemini-latency-label" class="font-mono tabular-nums text-slate-300">Kutilmoqda</span>
+          </div>
+          <div id="gemini-reply-content" class="p-2.5 rounded bg-surface-canvas font-sans text-xs text-slate-200 leading-relaxed border border-surface-border/40 min-h-[44px] flex items-center break-words">
+            <span class="text-slate-500 italic text-xs">Yuqoriga xabar yozib "AI Javobini Olish" tugmasini bosing...</span>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- SECTION 6: TELEGRAM BUSINESS BOT SETUP & OPERATION GUIDE -->
-    <section id="setup-guide" class="p-6 rounded-2xl bg-surface-card border border-surface-border space-y-6">
-      <div>
-        <h2 class="text-lg font-bold text-white">Telegram Business Botni Ishlatish Qo'llanmasi</h2>
-        <p class="mt-1 text-xs text-slate-400">
-          Bot shaxsiy hisobingizga (Telegram Business) ulangan holda ishlaydi va mijozlaringizga Oybek nomidan avtomatik javob beradi.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        
-        <div class="p-4 rounded-xl bg-[#090d16] border border-surface-border space-y-2">
-          <div class="text-xs font-mono text-sky-400">1-Qadam</div>
-          <h3 class="text-sm font-semibold text-white">Telegram Business sozlamasi</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Telegram ilovangizda: <br>
-            <strong class="text-slate-300">Sozlamalar</strong> &rarr; <strong class="text-slate-300">Telegram Business</strong> &rarr; <strong class="text-slate-300">Chat-botlar (Chatbots)</strong> bo'limiga kiring.
-          </p>
+      <!-- BO'LIM 4: FAOLIYAT JURNALI (375px ekranga mos) -->
+      <section id="activity-section" class="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-surface-card border border-surface-border space-y-3.5 sm:space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div>
+            <h2 class="text-sm sm:text-base font-bold text-white">Jonli Faoliyat Jurnali</h2>
+            <p class="text-xs text-slate-400">
+              Botga kelayotgan xabarlar va AI javoblari qaydnomasi.
+            </p>
+          </div>
+          
+          <!-- Filtrlar (gorizontal scrollable) -->
+          <div class="flex items-center gap-1 p-1 bg-[#090d16] border border-surface-border rounded-lg text-xs font-medium overflow-x-auto max-w-full scrollbar-none">
+            <button type="button" data-filter="all" class="filter-btn px-2.5 py-1 rounded text-white bg-surface-elevated transition-colors shrink-0">
+              Hammasi
+            </button>
+            <button type="button" data-filter="ai_reply" class="filter-btn px-2.5 py-1 rounded text-slate-400 hover:text-white transition-colors shrink-0">
+              AI Javoblar
+            </button>
+            <button type="button" data-filter="update" class="filter-btn px-2.5 py-1 rounded text-slate-400 hover:text-white transition-colors shrink-0">
+              Telegram
+            </button>
+            <button type="button" data-filter="error" class="filter-btn px-2.5 py-1 rounded text-slate-400 hover:text-white transition-colors shrink-0">
+              Xatoliklar
+            </button>
+          </div>
         </div>
 
-        <div class="p-4 rounded-xl bg-[#090d16] border border-surface-border space-y-2">
-          <div class="text-xs font-mono text-sky-400">2-Qadam</div>
-          <h3 class="text-sm font-semibold text-white">Botni tanlash va ulash</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            BotFather orqali yaratilgan botingiz nomini (username) qidirib toping va hisobingizga ulang. "Xabarlarga javob berish" ruxsatini yoqing.
-          </p>
+        <!-- Faoliyatlar ro'yxati -->
+        <div class="space-y-2 max-h-[400px] overflow-y-auto pr-0.5" id="activity-list">
+          <div class="p-5 text-center text-xs text-slate-500">
+            Faoliyatlar yuklanmoqda...
+          </div>
+        </div>
+      </section>
+
+      <!-- BO'LIM 5: TIZIM XATOLIKLARI (375px ekranga mos) -->
+      <section id="errors-section" class="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-surface-card border border-surface-border space-y-3.5 sm:space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-sm sm:text-base font-bold text-white">Tizim Xatoliklari</h2>
+              <span id="errors-count-badge" class="font-mono text-xs text-slate-400">0 ta</span>
+            </div>
+            <p class="text-xs text-slate-400">
+              Token va maxfiy ma'lumotlar avtomatik yashirilgan holda saqlanadi.
+            </p>
+          </div>
+          <div class="grid grid-cols-2 gap-2 w-full sm:w-auto">
+            <button id="btn-copy-errors" type="button" class="py-1.5 px-3 text-xs font-medium text-slate-300 bg-[#090d16] border border-surface-border rounded-lg hover:text-white transition-colors text-center">
+              Nusxa olish
+            </button>
+            <button id="btn-clear-errors" type="button" class="py-1.5 px-3 text-xs font-medium text-rose-400 bg-[#090d16] border border-surface-border rounded-lg hover:bg-rose-950/40 text-center">
+              Tozalash
+            </button>
+          </div>
         </div>
 
-        <div class="p-4 rounded-xl bg-[#090d16] border border-surface-border space-y-2">
-          <div class="text-xs font-mono text-sky-400">3-Qadam</div>
-          <h3 class="text-sm font-semibold text-white">Avtomatik aqlli javoblar</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Mijoz sizga yozganda bot unga Gemini AI yordamida samimiy va o'zbek tilida javob beradi. Siz o'zingiz yozganingizda esa bot aralashmaydi.
-          </p>
+        <div id="errors-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-0.5">
+          <div class="p-5 text-center text-xs text-slate-500 border border-dashed border-surface-border rounded-xl">
+            Hozircha xatoliklar qayd etilmagan.
+          </div>
         </div>
+      </section>
 
-      </div>
-
-      <!-- Quick note about Render -->
-      <div class="p-4 rounded-xl bg-surface-elevated/50 border border-surface-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-300">
-        <div>
-          <span class="font-semibold text-white">Render bepul tarifi haqida eslatma:</span>
-          <span class="text-slate-400 block sm:inline sm:ml-1">Render serveri 15 daqiqa faoliyatsiz bo'lsa uxlab qolishi mumkin. Ushbu interfeysdagi Keep-Alive funksiyasi uni doim uyg'oq tutadi.</span>
+      <!-- BO'LIM 6: QO'LLANMA (375px ekranga mos) -->
+      <section id="setup-guide" class="p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-surface-card border border-surface-border space-y-3">
+        <h2 class="text-sm sm:text-base font-bold text-white">Telegram Business Qo'llanmasi</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+          <div class="p-3 rounded-xl bg-[#090d16] border border-surface-border space-y-1">
+            <div class="text-[11px] font-mono text-sky-400">1-Qadam</div>
+            <h3 class="text-xs font-semibold text-white">Sozlamalar</h3>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              Telegram ilovangizda: <strong class="text-slate-300">Sozlamalar</strong> &rarr; <strong class="text-slate-300">Telegram Business</strong> &rarr; <strong class="text-slate-300">Chat-botlar</strong> bo'limiga kiring.
+            </p>
+          </div>
+          <div class="p-3 rounded-xl bg-[#090d16] border border-surface-border space-y-1">
+            <div class="text-[11px] font-mono text-sky-400">2-Qadam</div>
+            <h3 class="text-xs font-semibold text-white">Botni tanlash</h3>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              BotFather orqali yaratilgan botingizni qidirib topib ulang. "Xabarlarga javob berish" ruxsatini yoqing.
+            </p>
+          </div>
+          <div class="p-3 rounded-xl bg-[#090d16] border border-surface-border space-y-1">
+            <div class="text-[11px] font-mono text-sky-400">3-Qadam</div>
+            <h3 class="text-xs font-semibold text-white">Avto-javoblar</h3>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              Mijoz sizga yozganda bot unga Gemini AI orqali aqlli javob beradi. Siz o'zingiz yozganingizda esa bot aralashmaydi.
+            </p>
+          </div>
         </div>
-        <a href="https://telegram-bot-imap.onrender.com/" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 underline whitespace-nowrap shrink-0">
-          Render sahifasini ochish &rarr;
-        </a>
-      </div>
-    </section>
+      </section>
 
+    </div>
   </main>
 
-  <!-- FOOTER -->
-  <footer class="mt-auto border-t border-surface-border bg-surface-canvas py-6">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+  <!-- FOOTER (375px ekranga mos) -->
+  <footer class="mt-auto border-t border-surface-border bg-surface-canvas py-4">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-[11px] sm:text-xs text-slate-500 text-center sm:text-left">
       <div>
         <span>Telegram Business Bot &copy; 2026</span>
-        <span class="mx-2" aria-hidden="true">·</span>
-        <span>Render Monitoring &amp; Diagnostics</span>
+        <span class="mx-1.5" aria-hidden="true">·</span>
+        <span>Monitoring &amp; Control</span>
       </div>
-      <div class="flex items-center gap-4">
-        <a href="/errors" target="_blank" class="hover:text-slate-300 transition-colors">/errors JSON</a>
-        <a href="/api/status" target="_blank" class="hover:text-slate-300 transition-colors">/api/status</a>
-        <a href="https://telegram-bot-imap.onrender.com/" target="_blank" rel="noopener noreferrer" class="hover:text-sky-400 transition-colors">telegram-bot-imap.onrender.com</a>
+      <div class="flex items-center gap-3 flex-wrap justify-center font-mono">
+        <a href="/errors" target="_blank" class="hover:text-slate-300">/errors JSON</a>
+        <a href="/api/status" target="_blank" class="hover:text-slate-300">/api/status</a>
+        <a href="https://telegram-bot-imap.onrender.com/" target="_blank" rel="noopener noreferrer" class="hover:text-sky-400">onrender.com</a>
       </div>
     </div>
   </footer>
 
-  <!-- INLINE TOAST XABARNOMALAR KONTEYNERI (GLOBAL ALERTS O'RNIGA) -->
-  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+  <!-- TOAST XABARNOMALAR (375px ekranga mos chap/o'ng paddinglar bilan) -->
+  <div id="toast-container" class="fixed bottom-3 left-3 right-3 sm:left-auto sm:right-5 sm:w-96 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- CLIENT APP SCRIPT -->
+  <!-- CLIENT SCRIPT -->
   <script>
     (function () {
       let currentFilter = 'all';
@@ -670,7 +634,7 @@
       let cachedErrors = [];
       let keepAliveInterval = null;
 
-      // DOM Elements
+      // DOM elementlari
       const systemTimeEl = document.getElementById('system-time');
       const badgeBotStatusEl = document.getElementById('badge-bot-status');
       const metricUptimeEl = document.getElementById('metric-uptime');
@@ -688,12 +652,9 @@
       const sysGeminiKeyEl = document.getElementById('sys-gemini-key');
       const sysMemoryEl = document.getElementById('sys-memory');
       const sysNodeVerEl = document.getElementById('sys-node-ver');
-      const sysPromptPreviewEl = document.getElementById('sys-prompt-preview');
       const sysPortNumEl = document.getElementById('sys-port-num');
 
-      // Conflict and Polling Elements
       const conflictAlertCardEl = document.getElementById('conflict-alert-card');
-      const conflictBadgeCountEl = document.getElementById('conflict-badge-count');
       const pollingStatusIndicatorEl = document.getElementById('polling-status-indicator');
       const pollingStatusBadgeEl = document.getElementById('polling-status-badge');
       const pollingStatusDescriptionEl = document.getElementById('polling-status-description');
@@ -713,7 +674,6 @@
       const proberSpinnerEl = document.getElementById('prober-spinner');
       const pingSpinnerEl = document.getElementById('ping-spinner');
       const proberBtnTextEl = document.getElementById('prober-btn-text');
-      const pingBtnTextEl = document.getElementById('ping-btn-text');
 
       const resStatusCodeEl = document.getElementById('res-status-code');
       const resLatencyEl = document.getElementById('res-latency');
@@ -734,17 +694,34 @@
       const btnClearErrorsEl = document.getElementById('btn-clear-errors');
       const btnCopyErrorsEl = document.getElementById('btn-copy-errors');
 
-      // Format seconds into d, h, m, s
+      // Autentifikatsiya elementlari
+      const loginViewEl = document.getElementById('login-view');
+      const dashboardContentEl = document.getElementById('dashboard-content');
+      const siteLoginFormEl = document.getElementById('site-login-form');
+      const sitePasswordInputEl = document.getElementById('site-password-input');
+      const loginErrorBoxEl = document.getElementById('login-error-box');
+      const btnLoginSubmitEl = document.getElementById('btn-login-submit');
+      const loginSpinnerEl = document.getElementById('login-spinner');
+      const loginBtnTextEl = document.getElementById('login-btn-text');
+      const btnEyeToggleEl = document.getElementById('btn-eye-toggle');
+      const eyeIconShowEl = document.getElementById('eye-icon-show');
+      const eyeIconHideEl = document.getElementById('eye-icon-hide');
+      const headerAuthBadgeEl = document.getElementById('header-auth-badge');
+      const btnHeaderLogoutEl = document.getElementById('btn-header-logout');
+
+      const STORAGE_KEY = 'telegram_bot_admin_key';
+      let adminKey = localStorage.getItem(STORAGE_KEY) || '';
+      let refreshInterval = null;
+
       function formatUptime(seconds) {
         if (!seconds || seconds < 0) return '0s';
-        const d = Math.floor(seconds / (3600 * 24));
-        const h = Math.floor((seconds % (3600 * 24)) / 3600);
+        const d = Math.floor(seconds / 86400);
+        const h = Math.floor((seconds % 86400) / 3600);
         const m = Math.floor((seconds % 3600) / 60);
         const s = seconds % 60;
-        if (d > 0) return `${d}d ${h}h ${m}m ${s}s`;
-        if (h > 0) return `${h}h ${m}m ${s}s`;
-        if (m > 0) return `${m}m ${s}s`;
-        return `${s}s`;
+        if (d > 0) return `${d}k ${h}s ${m}d`;
+        if (h > 0) return `${h}s ${m}d`;
+        return `${m}d ${s}s`;
       }
 
       function formatTime(isoString) {
@@ -757,23 +734,24 @@
         }
       }
 
-      // Update Local Time
       function updateClock() {
         const now = new Date();
-        systemTimeEl.textContent = now.toLocaleTimeString('uz-UZ', { hour12: false }) + ' (Toshkent/Mahalliy)';
+        if (systemTimeEl) {
+          systemTimeEl.textContent = now.toLocaleTimeString('uz-UZ', { hour12: false });
+        }
       }
       setInterval(updateClock, 1000);
       updateClock();
 
-      // --- TOAST XABARNOMALAR (GLOBAL ALERTS VA POPUPSIZ) ---
+      // Toast xabarnoma chiqarish
       function showToast(message, type = 'info') {
         const container = document.getElementById('toast-container');
         if (!container) return;
         const toast = document.createElement('div');
         const bgColors = {
-          success: 'bg-emerald-950/90 border-emerald-700/60 text-emerald-200',
-          error: 'bg-rose-950/90 border-rose-700/60 text-rose-200',
-          warn: 'bg-amber-950/90 border-amber-700/60 text-amber-200',
+          success: 'bg-emerald-950/95 border-emerald-700/60 text-emerald-200',
+          error: 'bg-rose-950/95 border-rose-700/60 text-rose-200',
+          warn: 'bg-amber-950/95 border-amber-700/60 text-amber-200',
           info: 'bg-[#111726]/95 border-surface-border text-slate-200',
         };
         const icons = {
@@ -782,7 +760,7 @@
           warn: '⚠',
           info: 'ℹ',
         };
-        toast.className = `pointer-events-auto flex items-start gap-2.5 p-3 rounded-xl border text-xs shadow-xl backdrop-blur-md transition-all duration-300 transform translate-y-2 opacity-0 ${bgColors[type] || bgColors.info}`;
+        toast.className = `pointer-events-auto flex items-start gap-2 p-2.5 rounded-xl border text-xs shadow-2xl backdrop-blur-md transition-all duration-300 transform translate-y-2 opacity-0 ${bgColors[type] || bgColors.info}`;
         toast.innerHTML = `
           <span class="font-bold text-sm shrink-0">${icons[type] || 'ℹ'}</span>
           <div class="flex-1 leading-snug break-words">${escapeHtml(message)}</div>
@@ -794,125 +772,14 @@
         setTimeout(() => {
           toast.classList.add('translate-y-2', 'opacity-0');
           setTimeout(() => toast.remove(), 300);
-        }, 3500);
-      }
-
-      // --- INLINE AUTHENTICATION & API REQUESTS WRAPPER ---
-      const authUnauthViewEl = document.getElementById('auth-unauth-view');
-      const authSuccessViewEl = document.getElementById('auth-success-view');
-      const authInlineFormEl = document.getElementById('auth-inline-form');
-      const authPasswordInputEl = document.getElementById('auth-password-input');
-      const authStatusInlineMsgEl = document.getElementById('auth-status-inline-msg');
-      const authEnvBadgeEl = document.getElementById('auth-env-badge');
-      const btnToggleShowPassEl = document.getElementById('btn-toggle-show-pass');
-      const btnReenterPassEl = document.getElementById('btn-reenter-pass');
-      const btnForgetAuthEl = document.getElementById('btn-forget-auth');
-      const btnAuthManageEl = document.getElementById('btn-auth-manage');
-      const authStatusIconEl = document.getElementById('auth-status-icon');
-      const authStatusLabelEl = document.getElementById('auth-status-label');
-
-      // Pre-fill password if exists in session
-      if (authPasswordInputEl) {
-        authPasswordInputEl.value = sessionStorage.getItem('telegram_bot_admin_password') || '';
-      }
-
-      // Parolni ko'rsatish / yashirish toggle
-      btnToggleShowPassEl?.addEventListener('click', () => {
-        if (!authPasswordInputEl) return;
-        const isPass = authPasswordInputEl.type === 'password';
-        authPasswordInputEl.type = isPass ? 'text' : 'password';
-      });
-
-      // Headerdagi tugma bosilganda inline kartaga silliq o'tish
-      btnAuthManageEl?.addEventListener('click', () => {
-        const card = document.getElementById('admin-auth-card');
-        if (card) {
-          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          if (authUnauthViewEl?.classList.contains('hidden')) {
-            authUnauthViewEl.classList.remove('hidden');
-            authSuccessViewEl?.classList.add('hidden');
-          }
-          setTimeout(() => authPasswordInputEl?.focus(), 300);
-        }
-      });
-
-      btnReenterPassEl?.addEventListener('click', () => {
-        authUnauthViewEl?.classList.remove('hidden');
-        authSuccessViewEl?.classList.add('hidden');
-        if (authPasswordInputEl) {
-          authPasswordInputEl.value = sessionStorage.getItem('telegram_bot_admin_password') || '';
-          authPasswordInputEl.focus();
-        }
-      });
-
-      btnForgetAuthEl?.addEventListener('click', () => {
-        sessionStorage.removeItem('telegram_bot_admin_password');
-        showToast("Admin sessiyasi tozalandi (Chiqildi)", "info");
-        handleAuthRequired({ adminPasswordConfigured: true });
-        fetchStatus();
-      });
-
-      authInlineFormEl?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const pass = (authPasswordInputEl?.value || '').trim();
-        if (!pass) return;
-
-        sessionStorage.setItem('telegram_bot_admin_password', pass);
-        if (authStatusInlineMsgEl) authStatusInlineMsgEl.classList.add('hidden');
-
-        try {
-          const res = await apiFetch('/api/status');
-          if (res.ok) {
-            showToast("Admin paroli qabul qilindi! Boshqaruv to'liq faollashdi.", "success");
-            handleAuthSuccess();
-            fetchStatus();
-            fetchActivities();
-            fetchErrors();
-          } else {
-            const err = await res.json().catch(() => ({}));
-            showInlineAuthError(err.error || "Noto'g'ri parol (401 Unauthorized)");
-          }
-        } catch (err) {
-          showInlineAuthError("Ulanish xatosi: " + err.message);
-        }
-      });
-
-      function showInlineAuthError(msg) {
-        if (!authStatusInlineMsgEl) return;
-        authStatusInlineMsgEl.className = 'text-xs font-mono p-2.5 rounded-lg border border-rose-900/60 bg-rose-950/40 text-rose-300 block';
-        authStatusInlineMsgEl.textContent = msg;
-        authStatusInlineMsgEl.classList.remove('hidden');
-      }
-
-      function handleAuthRequired(data = {}) {
-        if (authUnauthViewEl) authUnauthViewEl.classList.remove('hidden');
-        if (authSuccessViewEl) authSuccessViewEl.classList.add('hidden');
-
-        if (data.adminPasswordConfigured === false) {
-          if (authEnvBadgeEl) authEnvBadgeEl.classList.remove('hidden');
-          showInlineAuthError("Serverda ADMIN_PASSWORD belgilanmagan. Render Environment sozlamalariga ADMIN_PASSWORD qo'shing.");
-        } else {
-          if (authEnvBadgeEl) authEnvBadgeEl.classList.add('hidden');
-        }
-
-        if (authStatusIconEl) authStatusIconEl.textContent = '🔒';
-        if (authStatusLabelEl) authStatusLabelEl.textContent = 'Parol Kiritish';
-      }
-
-      function handleAuthSuccess() {
-        if (authUnauthViewEl) authUnauthViewEl.classList.add('hidden');
-        if (authSuccessViewEl) authSuccessViewEl.classList.remove('hidden');
-        if (authStatusInlineMsgEl) authStatusInlineMsgEl.classList.add('hidden');
-        if (authStatusIconEl) authStatusIconEl.textContent = '🔓';
-        if (authStatusLabelEl) authStatusLabelEl.textContent = 'Kirilgan (Admin)';
+        }, 3200);
       }
 
       function getAuthHeaders() {
-        const pass = sessionStorage.getItem('telegram_bot_admin_password');
-        if (!pass) return {};
+        if (!adminKey) return {};
         return {
-          'Authorization': 'Basic ' + btoa('admin:' + pass),
-          'x-admin-password': pass,
+          'x-admin-password': adminKey,
+          'Authorization': 'Bearer ' + adminKey,
         };
       }
 
@@ -922,120 +789,230 @@
           ...getAuthHeaders(),
         };
         const res = await fetch(url, { ...options, headers });
-        if (res.status === 401) {
-          const data = await res.clone().json().catch(() => ({}));
-          handleAuthRequired(data);
-        } else if (res.ok) {
-          handleAuthSuccess();
+        if (res.status === 401 && !url.includes('/api/auth/')) {
+          setAuthenticated(false);
         }
         return res;
       }
 
-      // Fetch System Status
+      function setAuthenticated(isAuth) {
+        if (isAuth) {
+          loginViewEl?.classList.add('hidden');
+          dashboardContentEl?.classList.remove('hidden');
+          if (headerAuthBadgeEl) {
+            headerAuthBadgeEl.classList.remove('hidden');
+            headerAuthBadgeEl.classList.add('flex');
+          }
+          if (!refreshInterval) {
+            startAutoRefresh();
+          }
+        } else {
+          adminKey = '';
+          localStorage.removeItem(STORAGE_KEY);
+          loginViewEl?.classList.remove('hidden');
+          dashboardContentEl?.classList.add('hidden');
+          if (headerAuthBadgeEl) {
+            headerAuthBadgeEl.classList.add('hidden');
+            headerAuthBadgeEl.classList.remove('flex');
+          }
+          if (refreshInterval) {
+            clearInterval(refreshInterval);
+            refreshInterval = null;
+          }
+        }
+      }
+
+      function startAutoRefresh() {
+        if (refreshInterval) clearInterval(refreshInterval);
+        refreshInterval = setInterval(() => {
+          fetchStatus();
+          fetchActivities();
+          fetchErrors();
+        }, 3000);
+      }
+
+      // Parolni ko'rsatish/yashirish toggle (har doim sukut bo'yicha yashirin)
+      btnEyeToggleEl?.addEventListener('click', () => {
+        if (!sitePasswordInputEl) return;
+        const isPass = sitePasswordInputEl.type === 'password';
+        sitePasswordInputEl.type = isPass ? 'text' : 'password';
+        if (isPass) {
+          eyeIconShowEl?.classList.add('hidden');
+          eyeIconHideEl?.classList.remove('hidden');
+        } else {
+          eyeIconShowEl?.classList.remove('hidden');
+          eyeIconHideEl?.classList.add('hidden');
+        }
+      });
+
+      // Login form submit
+      siteLoginFormEl?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const pass = (sitePasswordInputEl?.value || '').trim();
+        if (!pass) return;
+
+        loginSpinnerEl?.classList.remove('hidden');
+        if (btnLoginSubmitEl) btnLoginSubmitEl.disabled = true;
+        if (loginBtnTextEl) loginBtnTextEl.textContent = 'Tekshirilmoqda...';
+        loginErrorBoxEl?.classList.add('hidden');
+
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password: pass }),
+          });
+
+          const data = await res.json().catch(() => ({}));
+
+          if (res.ok && data.success) {
+            adminKey = pass;
+            localStorage.setItem(STORAGE_KEY, pass);
+            // Formadagi parolni xotiradan tozalab qo'yamiz (ko'rinib turmasligi uchun)
+            if (sitePasswordInputEl) {
+              sitePasswordInputEl.value = '';
+              sitePasswordInputEl.type = 'password';
+              eyeIconShowEl?.classList.remove('hidden');
+              eyeIconHideEl?.classList.add('hidden');
+            }
+            showToast('Muvaffaqiyatli kirdingiz!', 'success');
+            setAuthenticated(true);
+            fetchStatus();
+            fetchActivities();
+            fetchErrors();
+            pingRenderServer();
+          } else {
+            if (loginErrorBoxEl) {
+              loginErrorBoxEl.textContent = data.error || "Noto'g'ri parol. Qaytadan urinib ko'ring.";
+              loginErrorBoxEl.classList.remove('hidden');
+            }
+            sitePasswordInputEl?.focus();
+          }
+        } catch (err) {
+          if (loginErrorBoxEl) {
+            loginErrorBoxEl.textContent = "Serverga ulanishda xatolik: " + err.message;
+            loginErrorBoxEl.classList.remove('hidden');
+          }
+        } finally {
+          loginSpinnerEl?.classList.add('hidden');
+          if (btnLoginSubmitEl) btnLoginSubmitEl.disabled = false;
+          if (loginBtnTextEl) loginBtnTextEl.textContent = 'Boshqaruvga Kirish';
+        }
+      });
+
+      // Logout
+      btnHeaderLogoutEl?.addEventListener('click', () => {
+        setAuthenticated(false);
+        showToast('Administrator sessiyasidan chiqildi.', 'info');
+      });
+
+      // Status
       async function fetchStatus() {
         try {
           const res = await apiFetch('/api/status');
-          if (!res.ok) throw new Error('Status server xatosi: ' + res.status);
+          if (!res.ok) return;
           const data = await res.json();
 
-          metricUptimeEl.textContent = formatUptime(data.uptimeSeconds);
-          metricStartTimeEl.textContent = formatTime(data.startedAt);
-          metricUpdatesEl.textContent = data.stats.totalUpdates.toLocaleString();
-          metricBusinessMessagesEl.textContent = data.stats.businessMessages.toLocaleString();
-          metricRepliesEl.textContent = data.stats.geminiReplies.toLocaleString();
-          badgeConnectionCountEl.textContent = `${data.businessConnectionsCount || 0} ta biznes ulanish`;
+          if (metricUptimeEl) metricUptimeEl.textContent = formatUptime(data.uptimeSeconds);
+          if (metricStartTimeEl) metricStartTimeEl.textContent = formatTime(data.startedAt);
+          if (metricUpdatesEl) metricUpdatesEl.textContent = (data.stats.totalUpdates || 0).toLocaleString();
+          if (metricBusinessMessagesEl) metricBusinessMessagesEl.textContent = (data.stats.businessMessages || 0).toLocaleString();
+          if (metricRepliesEl) metricRepliesEl.textContent = (data.stats.geminiReplies || 0).toLocaleString();
+          if (badgeConnectionCountEl) badgeConnectionCountEl.textContent = `${data.businessConnectionsCount || 0} ta ulanish`;
 
           if (data.botConfig && data.botConfig.hasBotToken) {
-            badgeBotStatusEl.textContent = data.stats.botUsername ? `@${data.stats.botUsername}` : 'Faol (Online)';
-            badgeBotStatusEl.className = 'text-xs font-mono font-medium text-emerald-400';
-            sysBotTokenEl.textContent = 'Mavjud (Yashiringan)';
-            sysBotTokenEl.className = 'text-emerald-400 font-mono';
+            if (badgeBotStatusEl) {
+              badgeBotStatusEl.textContent = data.stats.botUsername ? `@${data.stats.botUsername}` : 'Faol (Online)';
+              badgeBotStatusEl.className = 'text-xs font-mono font-medium text-emerald-400 truncate max-w-[150px]';
+            }
+            if (sysBotTokenEl) {
+              sysBotTokenEl.textContent = 'Faol';
+              sysBotTokenEl.className = 'text-emerald-400 font-mono';
+            }
           } else {
-            badgeBotStatusEl.textContent = 'Token Kutilmoqda';
-            badgeBotStatusEl.className = 'text-xs font-mono font-medium text-amber-400';
-            sysBotTokenEl.textContent = 'Kiritilmagan';
-            sysBotTokenEl.className = 'text-amber-400 font-mono';
+            if (badgeBotStatusEl) {
+              badgeBotStatusEl.textContent = 'Token Kutilmoqda';
+              badgeBotStatusEl.className = 'text-xs font-mono font-medium text-amber-400 truncate max-w-[150px]';
+            }
+            if (sysBotTokenEl) {
+              sysBotTokenEl.textContent = 'Yo\'q';
+              sysBotTokenEl.className = 'text-amber-400 font-mono';
+            }
           }
 
-          sysBotUserEl.textContent = data.stats.botUsername ? `@${data.stats.botUsername}` : (data.botConfig?.hasBotToken ? 'Ulanmoqda...' : 'Token yo\'q');
+          if (sysBotUserEl) {
+            sysBotUserEl.textContent = data.stats.botUsername ? `@${data.stats.botUsername}` : (data.botConfig?.hasBotToken ? 'Ulanmoqda...' : 'Token yo\'q');
+          }
           
-          if (data.botConfig && data.botConfig.hasGeminiKey) {
-            sysGeminiKeyEl.textContent = 'Mavjud (Faol)';
-            sysGeminiKeyEl.className = 'text-emerald-400 font-mono';
-          } else {
-            sysGeminiKeyEl.textContent = 'Kiritilmagan';
-            sysGeminiKeyEl.className = 'text-amber-400 font-mono';
+          if (sysGeminiKeyEl) {
+            if (data.botConfig && data.botConfig.hasGeminiKey) {
+              sysGeminiKeyEl.textContent = 'Faol';
+              sysGeminiKeyEl.className = 'text-emerald-400 font-mono';
+            } else {
+              sysGeminiKeyEl.textContent = 'Yo\'q';
+              sysGeminiKeyEl.className = 'text-amber-400 font-mono';
+            }
           }
 
-          if (data.memory) {
-            sysMemoryEl.textContent = `${data.memory.rssMb} MB RSS / ${data.memory.heapUsedMb} MB Heap`;
+          if (sysMemoryEl && data.memory) {
+            sysMemoryEl.textContent = `${data.memory.rssMb} MB`;
           }
 
-          sysNodeVerEl.textContent = data.nodeVersion || '--';
-          if (data.botConfig && data.botConfig.port && sysPortNumEl) {
-            sysPortNumEl.textContent = data.botConfig.port;
-          }
-          if (data.botConfig && data.botConfig.systemPrompt) {
-            sysPromptPreviewEl.textContent = data.botConfig.systemPrompt;
-          }
+          if (sysNodeVerEl) sysNodeVerEl.textContent = data.nodeVersion || '--';
+          if (sysPortNumEl && data.botConfig?.port) sysPortNumEl.textContent = data.botConfig.port;
 
-          // Polling va 409 Conflict holatini tekshirish
           if (data.polling) {
             const pol = data.polling;
-            if (pol.status === 'conflict' || (pol.conflictCount > 0 && pol.status !== 'paused')) {
+            if (pol.status === 'conflict') {
               conflictAlertCardEl?.classList.remove('hidden');
-              if (conflictBadgeCountEl) conflictBadgeCountEl.textContent = `${pol.conflictCount} marta`;
             } else {
               conflictAlertCardEl?.classList.add('hidden');
             }
 
             if (pol.status === 'running') {
-              if (pollingStatusIndicatorEl) pollingStatusIndicatorEl.className = 'w-3 h-3 rounded-full bg-emerald-500 animate-pulse shrink-0';
+              if (pollingStatusIndicatorEl) pollingStatusIndicatorEl.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0';
               if (pollingStatusBadgeEl) {
-                pollingStatusBadgeEl.className = 'px-2 py-0.5 text-xs font-mono font-medium text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 rounded';
+                pollingStatusBadgeEl.className = 'px-2 py-0.5 text-[11px] font-mono font-medium text-emerald-400 bg-emerald-950/40 border border-emerald-800/40 rounded';
                 pollingStatusBadgeEl.textContent = 'Faol (Running)';
               }
-              if (pollingStatusDescriptionEl) pollingStatusDescriptionEl.textContent = 'Ushbu AI Studio muhiti Telegram so\'rovlarini qabul qilmoqda.';
+              if (pollingStatusDescriptionEl) pollingStatusDescriptionEl.textContent = 'Telegram so\'rovlarini qabul qilmoqda.';
               if (btnTogglePollingEl) btnTogglePollingEl.textContent = 'Standby Rejimiga O\'tkazish';
             } else if (pol.status === 'conflict') {
-              if (pollingStatusIndicatorEl) pollingStatusIndicatorEl.className = 'w-3 h-3 rounded-full bg-rose-500 animate-ping shrink-0';
+              if (pollingStatusIndicatorEl) pollingStatusIndicatorEl.className = 'w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping shrink-0';
               if (pollingStatusBadgeEl) {
-                pollingStatusBadgeEl.className = 'px-2 py-0.5 text-xs font-mono font-medium text-rose-400 bg-rose-950/40 border border-rose-800/40 rounded';
-                pollingStatusBadgeEl.textContent = '409 To\'qnashuv (Conflict)';
+                pollingStatusBadgeEl.className = 'px-2 py-0.5 text-[11px] font-mono font-medium text-rose-400 bg-rose-950/40 border border-rose-800/40 rounded';
+                pollingStatusBadgeEl.textContent = '409 To\'qnashuv';
               }
-              if (pollingStatusDescriptionEl) pollingStatusDescriptionEl.textContent = pol.conflictMessage || 'Render yoki boshqa server bir paytda ishlamoqda.';
+              if (pollingStatusDescriptionEl) pollingStatusDescriptionEl.textContent = pol.conflictMessage || 'Render bilan to\'qnashuv.';
               if (btnTogglePollingEl) btnTogglePollingEl.textContent = 'Pollingni To\'xtatish (Standby)';
             } else {
-              if (pollingStatusIndicatorEl) pollingStatusIndicatorEl.className = 'w-3 h-3 rounded-full bg-amber-500 shrink-0';
+              if (pollingStatusIndicatorEl) pollingStatusIndicatorEl.className = 'w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0';
               if (pollingStatusBadgeEl) {
-                pollingStatusBadgeEl.className = 'px-2 py-0.5 text-xs font-mono font-medium text-amber-400 bg-amber-950/40 border border-amber-800/40 rounded';
-                pollingStatusBadgeEl.textContent = 'Standby (To\'xtatilgan)';
+                pollingStatusBadgeEl.className = 'px-2 py-0.5 text-[11px] font-mono font-medium text-amber-400 bg-amber-950/40 border border-amber-800/40 rounded';
+                pollingStatusBadgeEl.textContent = 'Standby (Kutish)';
               }
-              if (pollingStatusDescriptionEl) pollingStatusDescriptionEl.textContent = 'Lokal polling to\'xtatilgan. Render serveringiz (@ibrohimovvvich_bot) 409 xatosisiz ishlaydi.';
-              if (btnTogglePollingEl) btnTogglePollingEl.textContent = 'Pollingni Qayta Yoqish';
+              if (pollingStatusDescriptionEl) pollingStatusDescriptionEl.textContent = 'Lokal polling to\'xtatilgan. Render mustaqil ishlaydi.';
+              if (btnTogglePollingEl) btnTogglePollingEl.textContent = 'Pollingni Yoqish';
             }
           }
-
-        } catch (err) {
-          console.warn('Status yuklashda xatolik:', err);
+        } catch {
+          // Xatolikda jim qoladi
         }
       }
 
-
-      // Fetch Activities
+      // Faoliyatlar
       async function fetchActivities() {
         try {
           const res = await apiFetch('/api/activities');
-          if (!res.ok) throw new Error('Activities error');
+          if (!res.ok) return;
           const data = await res.json();
           cachedActivities = data.activities || [];
           renderActivities();
-        } catch (err) {
-          console.warn('Faoliyatlarni yuklashda xatolik:', err);
-        }
+        } catch {}
       }
 
       function renderActivities() {
+        if (!activityListEl) return;
         let items = cachedActivities;
         if (currentFilter !== 'all') {
           items = items.filter(it => it.type === currentFilter || (currentFilter === 'error' && it.status === 'error'));
@@ -1043,8 +1020,8 @@
 
         if (items.length === 0) {
           activityListEl.innerHTML = `
-            <div class="p-6 text-center text-xs text-slate-500 border border-dashed border-surface-border rounded-xl">
-              Ushbu filtr bo'yicha hech qanday faoliyat topilmadi.
+            <div class="p-4 text-center text-xs text-slate-500 border border-dashed border-surface-border rounded-xl">
+              Ushbu filtr bo'yicha hodisalar topilmadi.
             </div>
           `;
           return;
@@ -1052,7 +1029,6 @@
 
         activityListEl.innerHTML = items.map(it => {
           let statusColor = 'text-slate-400';
-          let borderLeftColor = 'border-surface-border';
           if (it.status === 'ok') {
             statusColor = it.type === 'ai_reply' ? 'text-sky-400' : 'text-emerald-400';
           } else if (it.status === 'warn') {
@@ -1062,82 +1038,70 @@
           }
 
           return `
-            <div class="p-3 rounded-lg bg-[#090d16] border border-surface-border hover:border-surface-borderLight transition-colors text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div class="space-y-1 min-w-0 flex-1">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="font-mono text-slate-500 tabular-nums">${formatTime(it.time)}</span>
-                  <span aria-hidden="true" class="text-slate-700">·</span>
-                  <span class="font-semibold text-white truncate">${escapeHtml(it.title)}</span>
-                </div>
-                <div class="text-slate-400 font-mono text-[11px] break-words">
-                  ${escapeHtml(it.details)}
-                </div>
+            <div class="p-2.5 rounded-lg bg-[#090d16] border border-surface-border text-xs space-y-1">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-mono text-slate-500 text-[11px] tabular-nums">${formatTime(it.time)}</span>
+                <span class="text-[11px] font-mono font-medium ${statusColor}">${escapeHtml(it.type)}</span>
               </div>
-              <div class="text-[11px] font-mono shrink-0 ${statusColor}">
-                ${it.type}
-              </div>
+              <div class="font-semibold text-white break-words">${escapeHtml(it.title)}</div>
+              <div class="text-slate-400 font-mono text-[11px] break-words">${escapeHtml(it.details)}</div>
             </div>
           `;
         }).join('');
       }
 
-      // Fetch Errors
+      // Xatoliklar
       async function fetchErrors() {
         try {
           const res = await apiFetch('/api/errors');
-          if (!res.ok) throw new Error('Errors error');
+          if (!res.ok) return;
           const data = await res.json();
           cachedErrors = data.errors || [];
           renderErrors();
-        } catch (err) {
-          console.warn('Xatoliklarni yuklashda xatolik:', err);
-        }
+        } catch {}
       }
 
       function renderErrors() {
-        errorsCountBadgeEl.textContent = `${cachedErrors.length} ta xatolik`;
+        if (!errorsListEl) return;
+        if (errorsCountBadgeEl) errorsCountBadgeEl.textContent = `${cachedErrors.length} ta`;
         
         if (cachedErrors.length === 0) {
           errorsListEl.innerHTML = `
-            <div class="p-6 text-center text-xs text-slate-500 border border-dashed border-surface-border rounded-xl">
-              Hozircha hech qanday xatolik qayd etilmagan. Bot barqaror ishlamoqda!
+            <div class="p-4 text-center text-xs text-slate-500 border border-dashed border-surface-border rounded-xl">
+              Hozircha xatoliklar qayd etilmagan. Bot barqaror ishlamoqda!
             </div>
           `;
           return;
         }
 
         errorsListEl.innerHTML = cachedErrors.map((err, idx) => `
-          <div class="p-3.5 rounded-lg bg-[#090d16] border border-rose-950/40 text-xs space-y-2">
-            <div class="flex items-center justify-between gap-2 flex-wrap">
-              <div class="flex items-center gap-2">
-                <span class="font-mono text-slate-500 tabular-nums">${formatTime(err.time)}</span>
-                <span aria-hidden="true" class="text-slate-700">·</span>
-                <span class="font-semibold text-rose-400 font-mono">${escapeHtml(err.where)}</span>
-              </div>
-              <span class="text-slate-500 text-[11px] font-mono">#${idx + 1}</span>
+          <div class="p-3 rounded-lg bg-[#090d16] border border-rose-950/40 text-xs space-y-1.5">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-mono text-slate-500 text-[11px] tabular-nums">${formatTime(err.time)}</span>
+              <span class="font-semibold text-rose-400 font-mono text-[11px] truncate">${escapeHtml(err.where)}</span>
+              <span class="text-slate-500 text-[10px] font-mono">#${idx + 1}</span>
             </div>
             <div class="text-slate-200 font-mono text-[11px] break-words">
               ${escapeHtml(err.message)}
             </div>
             ${err.stack ? `
               <details class="text-slate-500 text-[10px]">
-                <summary class="cursor-pointer hover:text-slate-300">Stack trace ko'rish</summary>
-                <pre class="mt-1 p-2 rounded bg-surface-canvas overflow-x-auto font-mono text-slate-400 whitespace-pre">${escapeHtml(err.stack)}</pre>
+                <summary class="cursor-pointer hover:text-slate-300">Stack trace</summary>
+                <pre class="mt-1 p-2 rounded bg-surface-canvas overflow-x-auto font-mono text-slate-400 text-[10px] break-all whitespace-pre">${escapeHtml(err.stack)}</pre>
               </details>
             ` : ''}
           </div>
         `).join('');
       }
 
-      // Ping Render Server
+      // Ping Render
       async function pingRenderServer() {
-        // Show spinning state
-        proberSpinnerEl.classList.remove('hidden');
-        pingSpinnerEl.classList.remove('hidden');
+        if (!btnPingRenderEl) return;
+        proberSpinnerEl?.classList.remove('hidden');
+        pingSpinnerEl?.classList.remove('hidden');
         btnPingRenderEl.disabled = true;
-        btnQuickPingEl.disabled = true;
-        proberBtnTextEl.textContent = 'Tekshirilmoqda...';
-        pingBtnTextEl.textContent = 'Kutilmoqda...';
+        if (btnQuickPingEl) btnQuickPingEl.disabled = true;
+        if (proberBtnTextEl) proberBtnTextEl.textContent = 'Tekshirilmoqda...';
 
         try {
           const res = await apiFetch('/api/ping-render', {
@@ -1146,63 +1110,64 @@
             body: JSON.stringify({}),
           });
 
-          if (!res.ok && res.status !== 200) {
-            const errData = await res.json().catch(() => ({}));
-            throw new Error(errData.error || `HTTP ${res.status}`);
+          const data = await res.json().catch(() => ({}));
+          
+          if (resStatusCodeEl) {
+            resStatusCodeEl.textContent = data.status ? `${data.status}` : 'Ulanmadi';
+            resStatusCodeEl.className = data.isAlive ? 'text-xs sm:text-sm font-bold font-mono tabular-nums text-emerald-400' : 'text-xs sm:text-sm font-bold font-mono tabular-nums text-rose-400';
           }
-
-          const data = await res.json();
-          
-          resStatusCodeEl.textContent = data.status ? `${data.status} ${data.statusText || ''}` : 'Ulanmadi';
-          resStatusCodeEl.className = data.isAlive ? 'text-base font-bold font-mono tabular-nums text-emerald-400' : 'text-base font-bold font-mono tabular-nums text-rose-400';
-          
-          resLatencyEl.textContent = `${data.durationMs} ms`;
-          resLatencyEl.className = data.durationMs < 1000 ? 'text-base font-bold font-mono tabular-nums text-emerald-400' : 'text-base font-bold font-mono tabular-nums text-amber-400';
-          
-          resRenderErrorsEl.textContent = data.errorsCount !== null ? `${data.errorsCount} ta` : '--';
-          resCheckedTimeEl.textContent = formatTime(data.checkedAt);
+          if (resLatencyEl) {
+            resLatencyEl.textContent = `${data.durationMs || 0} ms`;
+          }
+          if (resRenderErrorsEl) {
+            resRenderErrorsEl.textContent = data.errorsCount !== null && data.errorsCount !== undefined ? `${data.errorsCount} ta` : '--';
+          }
+          if (resCheckedTimeEl) {
+            resCheckedTimeEl.textContent = formatTime(data.checkedAt);
+          }
 
           if (data.isAlive) {
-            badgeRenderStatusEl.textContent = 'Ishlamoqda (Online)';
-            badgeRenderStatusEl.className = 'text-xs font-mono font-medium text-emerald-400';
-            metricRenderLatencyEl.textContent = `${data.durationMs} ms`;
-            metricRenderSubtextEl.textContent = data.responseText ? `Javob: "${data.responseText}"` : '200 OK';
-            resResponseTextEl.textContent = data.responseText || '(Bo\'sh javob)';
+            if (badgeRenderStatusEl) {
+              badgeRenderStatusEl.textContent = 'Online';
+              badgeRenderStatusEl.className = 'text-xs font-mono font-medium text-emerald-400';
+            }
+            if (metricRenderLatencyEl) metricRenderLatencyEl.textContent = `${data.durationMs || 0} ms`;
+            if (metricRenderSubtextEl) metricRenderSubtextEl.textContent = '200 OK (Faol)';
+            if (resResponseTextEl) resResponseTextEl.textContent = data.responseText || '(Bo\'sh javob)';
           } else {
-            badgeRenderStatusEl.textContent = 'Oflayn / Kutish';
-            badgeRenderStatusEl.className = 'text-xs font-mono font-medium text-rose-400';
-            metricRenderLatencyEl.textContent = 'Xato';
-            metricRenderSubtextEl.textContent = data.errorMessage || 'Server javob bermadi';
-            resResponseTextEl.textContent = `Xatolik: ${data.errorMessage || 'Render javob bermadi. Server uxlayotgan yoki deploy bo\'layotgan bo\'lishi mumkin.'}`;
+            if (badgeRenderStatusEl) {
+              badgeRenderStatusEl.textContent = 'Oflayn';
+              badgeRenderStatusEl.className = 'text-xs font-mono font-medium text-rose-400';
+            }
+            if (metricRenderLatencyEl) metricRenderLatencyEl.textContent = 'Xato';
+            if (resResponseTextEl) resResponseTextEl.textContent = data.errorMessage || 'Render server javob bermadi.';
           }
-
         } catch (err) {
-          resStatusCodeEl.textContent = 'Xato';
-          resStatusCodeEl.className = 'text-base font-bold font-mono text-rose-400';
-          resResponseTextEl.textContent = `So'rov yuborishda xatolik: ${err.message}`;
-          badgeRenderStatusEl.textContent = 'Aloqa xatosi';
-          badgeRenderStatusEl.className = 'text-xs font-mono font-medium text-rose-400';
+          if (badgeRenderStatusEl) {
+            badgeRenderStatusEl.textContent = 'Aloqa xatosi';
+            badgeRenderStatusEl.className = 'text-xs font-mono font-medium text-rose-400';
+          }
+          if (resResponseTextEl) resResponseTextEl.textContent = 'Xatolik: ' + err.message;
         } finally {
-          proberSpinnerEl.classList.add('hidden');
-          pingSpinnerEl.classList.add('hidden');
+          proberSpinnerEl?.classList.add('hidden');
+          pingSpinnerEl?.classList.add('hidden');
           btnPingRenderEl.disabled = false;
-          btnQuickPingEl.disabled = false;
-          proberBtnTextEl.textContent = 'Holatni Tekshirish (Ping)';
-          pingBtnTextEl.textContent = 'Render\'ni tekshirish';
+          if (btnQuickPingEl) btnQuickPingEl.disabled = false;
+          if (proberBtnTextEl) proberBtnTextEl.textContent = 'Holatni Tekshirish (Ping)';
         }
       }
 
-      // Gemini AI Test Prompt Form
-      geminiTestFormEl.addEventListener('submit', async function (e) {
+      // Gemini AI Test Form
+      geminiTestFormEl?.addEventListener('submit', async function (e) {
         e.preventDefault();
-        const text = geminiInputTextEl.value.trim();
+        const text = (geminiInputTextEl?.value || '').trim();
         if (!text) return;
 
-        geminiSpinnerEl.classList.remove('hidden');
-        btnGeminiSubmitEl.disabled = true;
-        geminiBtnTextEl.textContent = 'Kutilmoqda...';
-        geminiLatencyLabelEl.textContent = 'So\'rov yuborilmoqda...';
-        geminiReplyContentEl.innerHTML = '<span class="text-sky-400 animate-pulse">Gemini 3.8 Flash javob yaratmoqda...</span>';
+        geminiSpinnerEl?.classList.remove('hidden');
+        if (btnGeminiSubmitEl) btnGeminiSubmitEl.disabled = true;
+        if (geminiBtnTextEl) geminiBtnTextEl.textContent = 'Kutilmoqda...';
+        if (geminiLatencyLabelEl) geminiLatencyLabelEl.textContent = 'Javob kutilmoqda...';
+        if (geminiReplyContentEl) geminiReplyContentEl.innerHTML = '<span class="text-sky-400 animate-pulse text-xs">Gemini 3.8 Flash javob yaratmoqda...</span>';
 
         const t0 = performance.now();
 
@@ -1216,69 +1181,69 @@
           const data = await res.json();
           const ms = Math.round(performance.now() - t0);
 
-          if (data.success) {
-            geminiLatencyLabelEl.textContent = `${data.durationMs || ms} ms`;
+          if (data.success && geminiReplyContentEl) {
+            if (geminiLatencyLabelEl) geminiLatencyLabelEl.textContent = `${data.durationMs || ms} ms`;
             geminiReplyContentEl.textContent = data.reply;
-          } else {
-            geminiLatencyLabelEl.textContent = 'Xatolik';
-            geminiReplyContentEl.innerHTML = `<span class="text-rose-400">Xatolik: ${escapeHtml(data.error || 'Gemini javob bermadi')}</span>`;
+          } else if (geminiReplyContentEl) {
+            if (geminiLatencyLabelEl) geminiLatencyLabelEl.textContent = 'Xatolik';
+            geminiReplyContentEl.innerHTML = `<span class="text-rose-400 text-xs">Xatolik: ${escapeHtml(data.error || 'Gemini javob bermadi')}</span>`;
           }
 
-          // Refresh activities and status
           fetchStatus();
           fetchActivities();
-
         } catch (err) {
-          geminiLatencyLabelEl.textContent = 'Xatolik';
-          geminiReplyContentEl.innerHTML = `<span class="text-rose-400">Tarmoq xatosi: ${escapeHtml(err.message)}</span>`;
+          if (geminiReplyContentEl) {
+            geminiReplyContentEl.innerHTML = `<span class="text-rose-400 text-xs">Tarmoq xatosi: ${escapeHtml(err.message)}</span>`;
+          }
         } finally {
-          geminiSpinnerEl.classList.add('hidden');
-          btnGeminiSubmitEl.disabled = false;
-          geminiBtnTextEl.textContent = 'AI Javobini Olish';
+          geminiSpinnerEl?.classList.add('hidden');
+          if (btnGeminiSubmitEl) btnGeminiSubmitEl.disabled = false;
+          if (geminiBtnTextEl) geminiBtnTextEl.textContent = 'AI Javobini Olish';
         }
       });
 
-      // Quick prompt buttons
+      // Tezkor namunalar
       document.querySelectorAll('.quick-prompt-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+          if (!geminiInputTextEl) return;
           geminiInputTextEl.value = btn.textContent.trim();
           geminiInputTextEl.focus();
         });
       });
 
-      // Activity Filters
+      // Filtrlar
       document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('.filter-btn').forEach(b => {
-            b.className = 'filter-btn px-3 py-1 rounded text-slate-400 hover:text-white transition-colors';
+            b.className = 'filter-btn px-2.5 py-1 rounded text-slate-400 hover:text-white transition-colors shrink-0';
           });
-          btn.className = 'filter-btn px-3 py-1 rounded text-white bg-surface-elevated transition-colors';
+          btn.className = 'filter-btn px-2.5 py-1 rounded text-white bg-surface-elevated transition-colors shrink-0';
           currentFilter = btn.getAttribute('data-filter') || 'all';
           renderActivities();
         });
       });
 
-      // Clear Errors
-      btnClearErrorsEl.addEventListener('click', async () => {
+      // Xatoliklarni tozalash
+      btnClearErrorsEl?.addEventListener('click', async () => {
         try {
           await apiFetch('/api/errors/clear', { method: 'POST' });
           await fetchErrors();
           await fetchActivities();
-          showToast('Xatoliklar jurnali muvaffaqiyatli tozalandi', 'success');
+          showToast('Xatoliklar jurnali tozalandi', 'success');
         } catch (err) {
           showToast('Xatolik: ' + err.message, 'error');
         }
       });
 
-      // Copy Errors JSON
-      btnCopyErrorsEl.addEventListener('click', () => {
+      // Nusxa olish
+      btnCopyErrorsEl?.addEventListener('click', () => {
         const text = JSON.stringify(cachedErrors, null, 2);
         navigator.clipboard.writeText(text).then(() => {
           showToast('Xatoliklar JSON nusxalandi', 'success');
         });
       });
 
-      // Polling & Telegram Management Functions
+      // Polling boshqaruvi
       async function togglePolling(action) {
         try {
           const res = await apiFetch('/api/polling/toggle', {
@@ -1303,7 +1268,7 @@
             body: JSON.stringify({ dropPending: true }),
           });
           const d = await res.json();
-          showToast(d.message || "Telegram sessiya va webhook tozalandi!", 'success');
+          showToast(d.message || "Telegram sessiyasi tozalandi", 'success');
           fetchStatus();
           fetchActivities();
         } catch (err) {
@@ -1316,11 +1281,9 @@
           const res = await apiFetch('/api/telegram/info');
           const d = await res.json();
           const info = d.botInfo ? `@${d.botInfo.username}` : 'Mavjud emas';
-          const wh = d.webhookInfo ? (d.webhookInfo.url || 'Polling') : 'Noma\'lum';
-          const pending = d.webhookInfo ? (d.webhookInfo.pending_update_count ?? 0) : 0;
-          showToast(`Bot: ${info} | Polling: ${d.pollingStatus} | Webhook: ${wh} | Navbat: ${pending} ta`, 'info');
+          showToast(`Bot: ${info} | Polling: ${d.pollingStatus}`, 'info');
         } catch (err) {
-          showToast('Diagnostika olishda xato: ' + err.message, 'error');
+          showToast('Xato: ' + err.message, 'error');
         }
       }
 
@@ -1330,37 +1293,27 @@
       btnForceResetSessionEl?.addEventListener('click', resetTelegramSession);
       btnCheckTgInfoEl?.addEventListener('click', checkTelegramDiagnostics);
 
-      // Ping Buttons
-      btnPingRenderEl.addEventListener('click', pingRenderServer);
-      btnQuickPingEl.addEventListener('click', pingRenderServer);
-
-      // Refresh All
-      btnRefreshAllEl.addEventListener('click', () => {
+      btnPingRenderEl?.addEventListener('click', pingRenderServer);
+      btnQuickPingEl?.addEventListener('click', pingRenderServer);
+      btnRefreshAllEl?.addEventListener('click', () => {
         fetchStatus();
         fetchActivities();
         fetchErrors();
       });
 
-
-      // Render Keep-Alive toggle
-      renderKeepAliveToggleEl.addEventListener('change', () => {
+      renderKeepAliveToggleEl?.addEventListener('change', () => {
         if (renderKeepAliveToggleEl.checked) {
-          // Immediately ping once
           pingRenderServer();
-          // Schedule every 5 minutes (300,000 ms)
           if (keepAliveInterval) clearInterval(keepAliveInterval);
           keepAliveInterval = setInterval(pingRenderServer, 5 * 60 * 1000);
-          console.log('[KEEP-ALIVE] Har 5 daqiqada Render uyg\'otish faollashtirildi');
         } else {
           if (keepAliveInterval) {
             clearInterval(keepAliveInterval);
             keepAliveInterval = null;
           }
-          console.log('[KEEP-ALIVE] To\'xtatildi');
         }
       });
 
-      // Helper to escape HTML
       function escapeHtml(str) {
         if (!str) return '';
         return String(str)
@@ -1371,20 +1324,28 @@
           .replace(/'/g, '&#039;');
       }
 
-      // Initial Loads
-      fetchStatus();
-      fetchActivities();
-      fetchErrors();
-      // Auto ping Render on load to show current status immediately!
-      pingRenderServer();
+      // Sessiyani tekshirib ochish
+      async function initAuth() {
+        if (adminKey) {
+          try {
+            const res = await fetch('/api/auth/verify', {
+              headers: { 'x-admin-password': adminKey },
+            });
+            const data = await res.json();
+            if (data.authenticated) {
+              setAuthenticated(true);
+              fetchStatus();
+              fetchActivities();
+              fetchErrors();
+              pingRenderServer();
+              return;
+            }
+          } catch {}
+        }
+        setAuthenticated(false);
+      }
 
-      // Periodic auto-refresh every 3 seconds for live dashboard feeling
-      setInterval(() => {
-        fetchStatus();
-        fetchActivities();
-        fetchErrors();
-      }, 3000);
-
+      initAuth();
     })();
   </script>
 </body>
